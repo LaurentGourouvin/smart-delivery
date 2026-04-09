@@ -14,6 +14,45 @@ Niveau cible : mid+ développeur fullstack orienté Java/Spring Boot.
 
 ---
 
+## Status
+
+### Phase actuelle
+Phase 0 — Documentation et infrastructure de base
+
+### Fait
+- [x] Repo GitHub créé : `github.com/LaurentGourouvin/smart-delivery`
+- [x] Structure de dossiers initialisée (`services/`, `infra/`, `docs/`, `shared/`, `.github/`)
+- [x] `CLAUDE.md` — contexte complet du projet
+- [x] `README.md` — vitrine GitHub en anglais, badges, Swagger tous services
+- [x] `LICENSE` — MIT
+- [x] `docs/adr/001` — Docker Swarm over Kubernetes
+- [x] `docs/adr/002` — PostgreSQL for all services
+- [x] `docs/adr/003` — Kafka and REST coexistence
+- [x] `docs/adr/004` — Saga choreography over orchestration
+- [x] `docs/adr/005` — Asymmetric JWT with Keycloak JWKS
+- [x] `infra/docker-compose.yml` — stack Phase 1 (Traefik, Keycloak, PostgreSQL, Redis, Kafka, Kafka-UI)
+- [x] `infra/postgres/init.sql` — création des schemas isolés par service
+- [x] `infra/monitoring/prometheus.yml` — config scraping des services Spring Boot
+
+### En cours
+- [ ] Création des services via Spring Initializr (aucun service créé pour l'instant)
+
+### Bloquant
+- Aucun
+
+### Prochaine étape
+Créer `user-service` via Spring Initializr → `services/user-service/`
+
+### Décisions prises en session (non couvertes par les ADR)
+- ELK Stack (Elasticsearch, Logstash, Kibana) reporté en Phase 2 — trop lourd pour démarrer
+- Prometheus + Grafana + Jaeger reportés en Phase 2
+- `docker-stack.yml` (Swarm) reporté après que les services tournent en Compose
+- Frontend (React vs Angular 19) — décision non encore prise, dépend du marché ciblé en priorité
+- `notification-service` n'a pas de base PostgreSQL — service stateless, Kafka consumer pur
+- Pas de pom.xml parent pour l'instant — chaque service généré indépendamment via Spring Initializr
+
+---
+
 ## Stack technique
 
 ### Backend
