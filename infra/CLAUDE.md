@@ -122,7 +122,7 @@ Tests unitaires + intégration Testcontainers pour `user-service`
 | `payment-service` | 8086 | Paiement simulé | Saga pattern (chorégraphie), Kafka |
 | `frontend` | 3000 | Interface utilisateur | React ou Angular 19 |
 
-Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
+Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092, mode KRaft — sans Zookeeper), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
 
 ---
 

@@ -41,7 +41,7 @@ Phase 0 — Documentation et infrastructure de base
 - Aucun
 
 ### Prochaine étape
-Tests unitaires + intégration Testcontainers pour `user-service`
+Tests d'intégration Testcontainers (`UserControllerIT.java`) OU passer au service suivant (`product-service`)
 
 ### Avancement user-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
@@ -62,7 +62,9 @@ Tests unitaires + intégration Testcontainers pour `user-service`
 - [x] `exception/UserNotFoundException.java`
 - [x] `exception/AddressNotFoundException.java`
 - [x] `exception/GlobalExceptionHandler.java` — ProblemDetail RFC 9457
-- [ ] Tests unitaires + intégration Testcontainers
+- [x] Tests unitaires — 6 tests Mockito, mvn test sans Docker
+- [x] maven-failsafe-plugin — séparation unit/intégration
+- [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2 — trop lourd pour démarrer
@@ -122,7 +124,7 @@ Tests unitaires + intégration Testcontainers pour `user-service`
 | `payment-service` | 8086 | Paiement simulé | Saga pattern (chorégraphie), Kafka |
 | `frontend` | 3000 | Interface utilisateur | React ou Angular 19 |
 
-Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
+Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092, mode KRaft — sans Zookeeper), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
 
 ---
 

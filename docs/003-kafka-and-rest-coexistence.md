@@ -85,3 +85,5 @@ These are request-response interactions by nature. Modeling them as events would
 | Kafka only | Request-reply over Kafka is complex and unnatural for synchronous queries |
 | RabbitMQ instead of Kafka | Kafka chosen for its message retention (consumers can catch up after downtime), partition model, and stronger ecosystem in Java/Spring |
 | gRPC for synchronous calls | Adds proto compilation complexity; REST is sufficient for this project scale |
+
+> **Note (2026-04-09)** : Kafka is deployed in KRaft mode (no Zookeeper). Zookeeper was removed from the stack — Kafka manages its own coordination natively since version 3.x. One less dependency to operate.
