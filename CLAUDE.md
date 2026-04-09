@@ -35,21 +35,38 @@ Phase 0 — Documentation et infrastructure de base
 - [x] `infra/monitoring/prometheus.yml` — config scraping des services Spring Boot
 
 ### En cours
-- [ ] Création des services via Spring Initializr (aucun service créé pour l'instant)
+- [ ] user-service — repositories OK, couche service + controllers à faire
 
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-Créer `user-service` via Spring Initializr → `services/user-service/`
+Créer les DTOs puis `UserService` de `user-service`
+
+### Avancement user-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Actuator, Springdoc
+- [x] `V1__init_user_service.sql` — tables users + addresses, contraintes, index
+- [x] `docs/MCD.md` — modèle conceptuel de données documenté
+- [x] `entity/User.java` — entité JPA avec Lombok, @PrePersist, @OneToMany
+- [x] `entity/Address.java` — entité JPA avec @ManyToOne LAZY
+- [x] `repository/UserRepository.java` — findByEmail, findByKeycloakId, existsByEmail
+- [x] `repository/AddressRepository.java` — findByUserId, findByUserIdAndIsDefaultTrue
+- [ ] `dto/` — UserResponse, AddressResponse, CreateUserRequest, CreateAddressRequest
+- [ ] `service/UserService.java` — logique métier
+- [ ] `controller/UserController.java` — endpoints REST
+- [ ] `config/SecurityConfig.java` — configuration Spring Security + OAuth2
+- [ ] Tests unitaires + intégration Testcontainers
 
 ### Décisions prises en session (non couvertes par les ADR)
-- ELK Stack (Elasticsearch, Logstash, Kibana) reporté en Phase 2 — trop lourd pour démarrer
+- ELK Stack reporté en Phase 2 — trop lourd pour démarrer
 - Prometheus + Grafana + Jaeger reportés en Phase 2
 - `docker-stack.yml` (Swarm) reporté après que les services tournent en Compose
-- Frontend (React vs Angular 19) — décision non encore prise, dépend du marché ciblé en priorité
+- Frontend (React vs Angular 19) — décision non encore prise
 - `notification-service` n'a pas de base PostgreSQL — service stateless, Kafka consumer pur
 - Pas de pom.xml parent pour l'instant — chaque service généré indépendamment via Spring Initializr
+- Keycloak comme source de vérité unique pour les rôles et l'auth — pas de duplication locale
+- Package name généré en `user_service` (underscore) par Spring Initializr — conservé tel quel
 
 ---
 
