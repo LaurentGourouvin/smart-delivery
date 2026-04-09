@@ -41,7 +41,7 @@ Phase 0 — Documentation et infrastructure de base
 - Aucun
 
 ### Prochaine étape
-Créer `service/UserService.java` — provisioning JWT, gestion profil et adresses
+Tests unitaires + intégration Testcontainers pour `user-service`
 
 ### Avancement user-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
@@ -56,15 +56,12 @@ Créer `service/UserService.java` — provisioning JWT, gestion profil et adress
 - [x] `dto/AddressResponse.java` — record lecture adresse
 - [x] `dto/UpdateUserRequest.java` — modifier prénom, nom, téléphone
 - [x] `dto/CreateAddressRequest.java` — ajouter une adresse
-- [ ] `service/UserService.java` — logique métier :
-  - provisioning automatique au premier login (extrait claims JWT)
-  - getOrCreateUser(JWT) — cherche par keycloakId, crée si absent
-  - updateUser(keycloakId, UpdateUserRequest)
-  - addAddress(keycloakId, CreateAddressRequest)
-  - setDefaultAddress(keycloakId, addressId) — désactive les autres adresses par défaut
-  - deleteAddress(keycloakId, addressId)
-- [ ] `controller/UserController.java` — endpoints REST
-- [ ] `config/SecurityConfig.java` — configuration Spring Security + OAuth2
+- [x] `service/UserService.java` — provisioning JWT, gestion profil et adresses
+- [x] `controller/UserController.java` — endpoints REST (/me, /me/addresses)
+- [x] `config/SecurityConfig.java` — stateless, CSRF disabled, OAuth2 JWT
+- [x] `exception/UserNotFoundException.java`
+- [x] `exception/AddressNotFoundException.java`
+- [x] `exception/GlobalExceptionHandler.java` — ProblemDetail RFC 9457
 - [ ] Tests unitaires + intégration Testcontainers
 
 ### Décisions prises en session (non couvertes par les ADR)

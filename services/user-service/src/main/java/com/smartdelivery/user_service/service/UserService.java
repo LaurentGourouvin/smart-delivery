@@ -6,6 +6,8 @@ import com.smartdelivery.user_service.dto.UpdateUserRequest;
 import com.smartdelivery.user_service.dto.UserResponse;
 import com.smartdelivery.user_service.entity.Address;
 import com.smartdelivery.user_service.entity.User;
+import com.smartdelivery.user_service.exception.AddressNotFoundException;
+import com.smartdelivery.user_service.exception.UserNotFoundException;
 import com.smartdelivery.user_service.repository.AddressRepository;
 import com.smartdelivery.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -89,7 +91,7 @@ public class UserService {
 
         Address address = addressRepository.findById(addressId)
                 .filter(a -> a.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new AddressNotFoundException(addressId));
 
         address.setIsDefault(true);
         return toAddressResponse(addressRepository.save(address));
@@ -100,13 +102,13 @@ public class UserService {
         User user = findUserByKeycloakId(keycloakId);
         Address address = addressRepository.findById(addressId)
                 .filter(a -> a.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new AddressNotFoundException(addressId));
         addressRepository.delete(address);
     }
 
     private User findUserByKeycloakId(UUID keycloakId) {
         return userRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
     }
 
     private UserResponse toUserResponse(User user) {
