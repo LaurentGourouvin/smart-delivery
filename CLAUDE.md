@@ -41,7 +41,7 @@ Phase 0 — Documentation et infrastructure de base
 - Aucun
 
 ### Prochaine étape
-Créer les DTOs puis `UserService` de `user-service`
+Créer `service/UserService.java` — provisioning JWT, gestion profil et adresses
 
 ### Avancement user-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
@@ -52,8 +52,17 @@ Créer les DTOs puis `UserService` de `user-service`
 - [x] `entity/Address.java` — entité JPA avec @ManyToOne LAZY
 - [x] `repository/UserRepository.java` — findByEmail, findByKeycloakId, existsByEmail
 - [x] `repository/AddressRepository.java` — findByUserId, findByUserIdAndIsDefaultTrue
-- [ ] `dto/` — UserResponse, AddressResponse, CreateUserRequest, CreateAddressRequest
-- [ ] `service/UserService.java` — logique métier
+- [x] `dto/UserResponse.java` — record lecture utilisateur
+- [x] `dto/AddressResponse.java` — record lecture adresse
+- [x] `dto/UpdateUserRequest.java` — modifier prénom, nom, téléphone
+- [x] `dto/CreateAddressRequest.java` — ajouter une adresse
+- [ ] `service/UserService.java` — logique métier :
+  - provisioning automatique au premier login (extrait claims JWT)
+  - getOrCreateUser(JWT) — cherche par keycloakId, crée si absent
+  - updateUser(keycloakId, UpdateUserRequest)
+  - addAddress(keycloakId, CreateAddressRequest)
+  - setDefaultAddress(keycloakId, addressId) — désactive les autres adresses par défaut
+  - deleteAddress(keycloakId, addressId)
 - [ ] `controller/UserController.java` — endpoints REST
 - [ ] `config/SecurityConfig.java` — configuration Spring Security + OAuth2
 - [ ] Tests unitaires + intégration Testcontainers
