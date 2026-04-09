@@ -3,7 +3,7 @@
 > E-commerce order management platform built with a microservices architecture.
 > Showcase project demonstrating distributed systems patterns, event-driven architecture, and DevOps practices.
 
-![CI](https://github.com/[username]/smart-delivery/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/LaurentGourouvin/smart-delivery/actions/workflows/ci.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)
 ![Kafka](https://img.shields.io/badge/Apache%20Kafka-3.x-black)
@@ -88,7 +88,7 @@ The project is designed as a **technical showcase** covering:
 - **Spring WebSocket** — real-time delivery tracking
 - **PostgreSQL** — all service databases (one schema per service)
 - **Redis** — shared cache and session store
-- **Springdoc OpenAPI** — API documentation per service
+- **Springdoc OpenAPI** — API documentation exposed by every service
 
 ### Frontend
 - **React** or **Angular 19** (depending on target market)
@@ -151,7 +151,12 @@ Services will be available at:
 | Keycloak | http://localhost:8080 |
 | Grafana | http://localhost:3001 |
 | Jaeger UI | http://localhost:16686 |
-| Swagger (order-service) | http://localhost:8082/swagger-ui.html |
+| Swagger — user-service | http://localhost:8081/swagger-ui.html |
+| Swagger — order-service | http://localhost:8082/swagger-ui.html |
+| Swagger — product-service | http://localhost:8083/swagger-ui.html |
+| Swagger — delivery-service | http://localhost:8084/swagger-ui.html |
+| Swagger — notification-service | http://localhost:8085/swagger-ui.html |
+| Swagger — payment-service | http://localhost:8086/swagger-ui.html |
 
 ### Deploy on Docker Swarm
 
@@ -271,8 +276,8 @@ This project is a demo — no real payments or deliveries are processed.
 **Laurent** — Fullstack developer (Java / Spring Boot · TypeScript · Angular · React)
 Bordeaux, France · Targeting South Korea 2027
 
-[![GitHub](https://img.shields.io/badge/GitHub-GourouvinLaurent-black)](https://github.com/LaurentGourouvin)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-GourouvinLaurent-blue)](https://www.linkedin.com/in/laurentgourouvin/)
+[![GitHub](https://img.shields.io/badge/GitHub-LaurentGourouvin-black)](https://github.com/LaurentGourouvin)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-LaurentGourouvin-blue)](https://www.linkedin.com/in/laurentgourouvin/)
 
 ---
 
