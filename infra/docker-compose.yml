@@ -25,7 +25,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
     container_name: sd-keycloak
-    command: start-dev
+    command: start-dev --import-realm
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -36,6 +36,8 @@ services:
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_HTTP_ENABLED: "true"
+    volumes:
+      - ./keycloak/smartdelivery-realm.json:/opt/keycloak/data/import/smartdelivery-realm.json
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
