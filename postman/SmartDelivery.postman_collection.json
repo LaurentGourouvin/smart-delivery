@@ -1,0 +1,657 @@
+{
+  "info": {
+    "_postman_id": "f3c83ef5-f0d2-49c0-ac74-1ad1dc712fe2",
+    "name": "SmartDelivery",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "20910261"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('token', json.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "smart-delivery-app",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{client_secret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "laurent",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloak_url}}/realms/smartdelivery/protocol/openid-connect/token",
+              "host": [
+                "{{keycloak_url}}"
+              ],
+              "path": [
+                "realms",
+                "smartdelivery",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "UserService",
+      "item": [
+        {
+          "name": "Get my profile (GET /me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{user_service}}/api/users/me",
+              "host": [
+                "{{user_service}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update my profile (PUT /me)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Laurent\",\n  \"lastName\": \"Gourouvin\",\n  \"phone\": \"+33600000000\"\n}"
+            },
+            "url": {
+              "raw": "{{user_service}}/api/users/me",
+              "host": [
+                "{{user_service}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add address (POST /me/addresses)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Maison\",\n  \"street\": \"1 rue de la Paix\",\n  \"city\": \"Bordeaux\",\n  \"postalCode\": \"33000\",\n  \"country\": \"FR\",\n  \"isDefault\": true\n}"
+            },
+            "url": {
+              "raw": "{{user_service}}/api/users/me/addresses",
+              "host": [
+                "{{user_service}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me",
+                "addresses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Set default address (PATCH /me/addresses/:id/default)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{user_service}}/api/users/me/addresses/ADRESSE_ID/default",
+              "host": [
+                "{{user_service}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me",
+                "addresses",
+                "ADRESSE_ID",
+                "default"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete address (DELETE /me/addresses/:id)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{user_service}}/api/users/me/addresses/ADRESSE_ID",
+              "host": [
+                "{{user_service}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me",
+                "addresses",
+                "ADRESSE_ID"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ProductService",
+      "item": [
+        {
+          "name": "Get all categories (GET /categories)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products/categories",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get category by slug (GET /categories/:slug)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products/categories/serum",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "categories",
+                "serum"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all products (GET /products)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get products by category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products?categoryId=CATEGORY_ID",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "CATEGORY_ID"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get products by brand",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products?brand=COSRX",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "brand",
+                  "value": "COSRX"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get products by skin type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products?skinType=OILY",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "skinType",
+                  "value": "OILY"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get products in stock",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products?inStock=true",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "inStock",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get product by id (GET /products/:id)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products/PRODUCT_ID",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "PRODUCT_ID"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create product (POST /products)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"CATEGORY_ID\",\n  \"name\": \"COSRX Advanced Snail 96 Mucin Power Essence\",\n  \"description\": \"Essence régénérante à base de mucine d'escargot\",\n  \"brand\": \"COSRX\",\n  \"price\": 24.99,\n  \"stock\": 50,\n  \"skinType\": \"ALL\",\n  \"volumeMl\": 100,\n  \"imageUrl\": null\n}"
+            },
+            "url": {
+              "raw": "{{product_service}}/api/products",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update product (PUT /products/:id)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"COSRX Advanced Snail 96 Mucin Power Essence\",\n  \"description\": \"Essence régénérante à base de mucine d'escargot\",\n  \"brand\": \"COSRX\",\n  \"price\": 22.99,\n  \"skinType\": \"ALL\",\n  \"volumeMl\": 100,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{product_service}}/api/products/PRODUCT_ID",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "PRODUCT_ID"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update stock (PATCH /products/:id/stock)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 100\n}"
+            },
+            "url": {
+              "raw": "{{product_service}}/api/products/PRODUCT_ID/stock",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "PRODUCT_ID",
+                "stock"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Decrement stock (PATCH /products/:id/stock/decrement)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products/PRODUCT_ID/stock/decrement?quantity=1",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "PRODUCT_ID",
+                "stock",
+                "decrement"
+              ],
+              "query": [
+                {
+                  "key": "quantity",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Restore stock (PATCH /products/:id/stock/restore)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_service}}/api/products/PRODUCT_ID/stock/restore?quantity=1",
+              "host": [
+                "{{product_service}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "PRODUCT_ID",
+                "stock",
+                "restore"
+              ],
+              "query": [
+                {
+                  "key": "quantity",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost"
+    },
+    {
+      "key": "keycloak_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "client_secret",
+      "value": "6ilsJ3Si9MUHgpm2a1p8K4QA4z8v9kPg"
+    },
+    {
+      "key": "user_service",
+      "value": ""
+    },
+    {
+      "key": "product_service",
+      "value": ""
+    }
+  ]
+}
