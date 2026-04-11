@@ -280,7 +280,36 @@ src/main/java/com/smartdelivery/{service}/
 
 ---
 
-## Commandes utiles
+## CI/CD
+
+### Stratégie de branches
+```
+feature/*  →  develop  →  main
+```
+
+### Pipelines GitHub Actions
+
+**`ci-develop.yml`** — déclenché sur PR vers `develop`
+- Compile + `mvn test` (tests unitaires uniquement, pas de Docker)
+- Matrix strategy : tourne en parallèle pour chaque service
+- Objectif : feedback rapide, ne pas casser le build
+
+**`ci-main.yml`** — déclenché sur PR vers `main`
+- Compile + `mvn test`
+- CodeQL SAST (analyse de sécurité statique)
+- Objectif : quality gate complète avant prod
+
+### Ajouter un nouveau service aux pipelines
+Dans les deux fichiers `ci-develop.yml` et `ci-main.yml`, ajouter le service dans la matrix :
+```yaml
+matrix:
+  service: [user-service, product-service, order-service]
+```
+
+### Pourquoi CodeQL uniquement sur main
+- CodeQL est lent (5-15 min) — trop lourd pour chaque PR de feature
+- Les vulnérabilités sont traitées sereinement avant prod
+- `develop` = feedback rapide, `main` = qualité garantie
 
 ```bash
 # Démarrer l'environnement de dev local
