@@ -46,11 +46,26 @@ Phase 1 — Core services
 - [x] Validé end-to-end — JWT Keycloak → provisioning automatique → réponse JSON
 - [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
+### Avancement payment-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Kafka consumer + producer
+- [x] `V1__init_payment_service.sql` — table payments, contraintes UNIQUE sur order_id
+- [x] `docs/MCD.md` — modèle conceptuel documenté
+- [x] `entity/Payment.java` + `entity/PaymentStatus.java`
+- [x] `repository/PaymentRepository.java` — findByOrderId, existsByOrderId
+- [x] `event/` — OrderCreatedEvent, OrderItemEvent, PaymentSucceededEvent, PaymentFailedEvent
+- [x] `service/PaymentService.java` — @KafkaListener, Saga 90/10, idempotence
+- [x] `controller/PaymentController.java` — GET /api/payments/order/:orderId
+- [x] `config/SecurityConfig.java`
+- [x] `exception/` — PaymentNotFoundException, PaymentAlreadyExistsException, GlobalExceptionHandler
+- [x] Validé end-to-end — 5 commandes traitées : 4 payment.succeeded + 1 payment.failed
+- [x] Tests unitaires — 4 tests Mockito (idempotence, success, failure)
+
 ### En cours
-- [ ] Merge feature/order-service → develop → main
+- [ ] notification-service — Kafka consumer pur, pas de BDD
 
 ### Prochaine étape
-Tests unitaires order-service ✓ → CHANGELOG → merge
+Créer `notification-service` via Spring Initializr
 
 ### Avancement order-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)

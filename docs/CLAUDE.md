@@ -46,14 +46,65 @@ Phase 1 — Core services
 - [x] Validé end-to-end — JWT Keycloak → provisioning automatique → réponse JSON
 - [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
+### Avancement payment-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Kafka consumer + producer
+- [x] `V1__init_payment_service.sql` — table payments, contraintes UNIQUE sur order_id
+- [x] `docs/MCD.md` — modèle conceptuel documenté
+- [x] `entity/Payment.java` + `entity/PaymentStatus.java`
+- [x] `repository/PaymentRepository.java` — findByOrderId, existsByOrderId
+- [x] `event/` — OrderCreatedEvent, OrderItemEvent, PaymentSucceededEvent, PaymentFailedEvent
+- [x] `service/PaymentService.java` — @KafkaListener, Saga 90/10, idempotence
+- [x] `controller/PaymentController.java` — GET /api/payments/order/:orderId
+- [x] `config/SecurityConfig.java`
+- [x] `exception/` — PaymentNotFoundException, PaymentAlreadyExistsException, GlobalExceptionHandler
+- [x] Validé end-to-end — 5 commandes traitées : 4 payment.succeeded + 1 payment.failed
+- [ ] Tests unitaires
+
 ### En cours
-- [ ] product-service — à créer via Spring Initializr
+- [ ] notification-service — Kafka consumer pur, pas de BDD
+
+### Prochaine étape
+Créer `notification-service` via Spring Initializr
+
+### Avancement order-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Kafka, Actuator, Springdoc
+- [x] `V1__init_order_service.sql` — tables orders + order_items, contraintes, index
+- [x] `docs/MCD.md` — modèle conceptuel de données documenté
+- [x] `entity/Order.java` + `entity/OrderItem.java` + `entity/OrderStatus.java`
+- [x] `repository/OrderRepository.java` + `repository/OrderItemRepository.java`
+- [x] `dto/` — OrderResponse, OrderItemResponse, CreateOrderRequest, UpdateOrderStatusRequest, DeliveryAddressRequest, OrderItemRequest
+- [x] `event/` — OrderCreatedEvent, OrderItemEvent, OrderStatusChangedEvent (fat events)
+- [x] `client/ProductServiceClient.java` — Anti-Corruption Layer vers product-service
+- [x] `service/OrderService.java` — CQRS simplifié, Kafka producer, token propagation
+- [x] `controller/OrderController.java` — endpoints REST
+- [x] `config/SecurityConfig.java` + `config/RestClientConfig.java`
+- [x] `exception/` — OrderNotFoundException, InsufficientStockException, GlobalExceptionHandler
+- [x] Tests unitaires — 6 tests Mockito
+- [x] Validé end-to-end — commande créée, stock décrémenté, order.created visible dans Kafka-UI
+
+### Avancement product-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Actuator, Springdoc
+- [x] `V1__init_product_service.sql` — tables categories + products, K-beauty seed
+- [x] `docs/MCD.md` — modèle conceptuel de données documenté
+- [x] `entity/Category.java` + `entity/Product.java` + `entity/SkinType.java`
+- [x] `repository/CategoryRepository.java` + `repository/ProductRepository.java`
+- [x] `dto/` — CategoryResponse, ProductResponse, CreateProductRequest, UpdateProductRequest, UpdateStockRequest
+- [x] `service/ProductService.java` — logique métier + Optimistic Lock
+- [x] `controller/ProductController.java` — endpoints REST
+- [x] `config/SecurityConfig.java`
+- [x] `exception/` — ProductNotFoundException, CategoryNotFoundException, GlobalExceptionHandler
+- [x] Validé end-to-end — JWT Keycloak → GET /api/products/categories → 8 catégories K-beauty
+- [x] Tests unitaires — 8 tests Mockito, mvn test sans Docker
+- [x] `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur Product et Category
 
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-Créer `product-service` via Spring Initializr → `services/product-service/`
+Tests unitaires `product-service` puis passer à `order-service`
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2
@@ -239,6 +290,11 @@ src/main/java/com/smartdelivery/{service}/
 - Toujours par constructeur — jamais `@Autowired` sur les champs
 - Utiliser `@RequiredArgsConstructor` (Lombok) pour réduire le boilerplate
 
+### Entités JPA
+- Toujours ajouter `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur toutes les entités JPA
+- Toujours marquer `id` avec `@EqualsAndHashCode.Include`
+- Raison : évite les références circulaires et les StackOverflowError avec `@Data` + relations JPA
+
 ---
 
 ## Ce que Claude ne doit pas faire
@@ -256,7 +312,41 @@ src/main/java/com/smartdelivery/{service}/
 
 ---
 
-## Commandes utiles
+## CI/CD
+
+### Stratégie de branches
+```
+feature/*  →  develop  →  main
+```
+
+### Pipelines GitHub Actions
+
+**`ci-develop.yml`** — déclenché sur PR vers `develop`
+- Compile + `mvn test` (tests unitaires uniquement, pas de Docker)
+- Matrix strategy : tourne en parallèle pour chaque service
+- Objectif : feedback rapide, ne pas casser le build
+
+**`ci-main.yml`** — déclenché sur PR vers `main`
+- Compile + `mvn test`
+- CodeQL SAST (analyse de sécurité statique)
+- Objectif : quality gate complète avant prod
+
+### Ajouter un nouveau service aux pipelines
+Dans les deux fichiers `ci-develop.yml` et `ci-main.yml`, ajouter le service dans la matrix :
+```yaml
+matrix:
+  service: [user-service, product-service, order-service]
+```
+
+### Règle CHANGELOG
+- Le fichier `CHANGELOG.md` est à la racine du repo
+- Format : [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+- **Sur chaque PR vers `develop`** : mettre à jour la section `[Unreleased]` avec les changements
+- **Sur chaque PR vers `main`** : renommer `[Unreleased]` avec le numéro de version et la date
+- Catégories : `Added`, `Fixed`, `Changed`, `Removed`, `Infrastructure`
+- CodeQL est lent (5-15 min) — trop lourd pour chaque PR de feature
+- Les vulnérabilités sont traitées sereinement avant prod
+- `develop` = feedback rapide, `main` = qualité garantie
 
 ```bash
 # Démarrer l'environnement de dev local
