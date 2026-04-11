@@ -61,11 +61,17 @@ Phase 1 — Core services
 - [x] Validé end-to-end — 5 commandes traitées : 4 payment.succeeded + 1 payment.failed
 - [x] Tests unitaires — 4 tests Mockito (idempotence, success, failure)
 
-### En cours
-- [ ] notification-service — Kafka consumer pur, pas de BDD
+### Avancement notification-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — Kafka consumer uniquement, pas de BDD, pas de sécurité
+- [x] `event/` — OrderCreatedEvent, PaymentSucceededEvent, PaymentFailedEvent
+- [x] `service/NotificationService.java` — 3 @KafkaListener, emails simulés en logs
+- [x] `config/KafkaConsumerConfig.java` — 3 factories typées par topic
+- [x] Tests unitaires — 3 tests assertThatNoException
+- [x] Validé end-to-end — rattrapé tous les anciens messages au démarrage
 
-### Prochaine étape
-Créer `notification-service` via Spring Initializr
+### En cours
+- [ ] delivery-service — WebSocket, tracking simulé, dernier service
 
 ### Avancement order-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)

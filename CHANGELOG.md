@@ -8,8 +8,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### In progress
-- `notification-service` — Kafka consumer pur, pas de BDD
-- `delivery-service` — WebSocket real-time tracking
+- `delivery-service` — WebSocket real-time tracking, dernier service
+
+---
+
+## [0.5.0] — 2026-04-11
+
+### Added
+- `notification-service` — Kafka consumer pur
+  - 3 `@KafkaListener` — `order.created`, `payment.succeeded`, `payment.failed`
+  - `KafkaConsumerConfig` — 3 factories typées par topic
+  - Emails simulés dans les logs avec format ╔══ bordure
+  - Pas de base de données, pas d'API REST, pas d'OAuth2
+  - 3 tests unitaires
+  - Validé end-to-end — rattrapé tous les anciens messages au démarrage
 
 ---
 
