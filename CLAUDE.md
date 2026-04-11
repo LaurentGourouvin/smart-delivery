@@ -47,10 +47,27 @@ Phase 1 — Core services
 - [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
 ### En cours
-- [ ] order-service — à créer via Spring Initializr
+- [ ] Merge feature/order-service → develop → main
 
 ### Prochaine étape
-Créer `order-service` via Spring Initializr → `services/order-service/`
+Tests unitaires order-service ✓ → CHANGELOG → merge
+
+### Avancement order-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Kafka, Actuator, Springdoc
+- [x] `V1__init_order_service.sql` — tables orders + order_items, contraintes, index
+- [x] `docs/MCD.md` — modèle conceptuel de données documenté
+- [x] `entity/Order.java` + `entity/OrderItem.java` + `entity/OrderStatus.java`
+- [x] `repository/OrderRepository.java` + `repository/OrderItemRepository.java`
+- [x] `dto/` — OrderResponse, OrderItemResponse, CreateOrderRequest, UpdateOrderStatusRequest, DeliveryAddressRequest, OrderItemRequest
+- [x] `event/` — OrderCreatedEvent, OrderItemEvent, OrderStatusChangedEvent (fat events)
+- [x] `client/ProductServiceClient.java` — Anti-Corruption Layer vers product-service
+- [x] `service/OrderService.java` — CQRS simplifié, Kafka producer, token propagation
+- [x] `controller/OrderController.java` — endpoints REST
+- [x] `config/SecurityConfig.java` + `config/RestClientConfig.java`
+- [x] `exception/` — OrderNotFoundException, InsufficientStockException, GlobalExceptionHandler
+- [x] Tests unitaires — 6 tests Mockito
+- [x] Validé end-to-end — commande créée, stock décrémenté, order.created visible dans Kafka-UI
 
 ### Avancement product-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
@@ -306,7 +323,12 @@ matrix:
   service: [user-service, product-service, order-service]
 ```
 
-### Pourquoi CodeQL uniquement sur main
+### Règle CHANGELOG
+- Le fichier `CHANGELOG.md` est à la racine du repo
+- Format : [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+- **Sur chaque PR vers `develop`** : mettre à jour la section `[Unreleased]` avec les changements
+- **Sur chaque PR vers `main`** : renommer `[Unreleased]` avec le numéro de version et la date
+- Catégories : `Added`, `Fixed`, `Changed`, `Removed`, `Infrastructure`
 - CodeQL est lent (5-15 min) — trop lourd pour chaque PR de feature
 - Les vulnérabilités sont traitées sereinement avant prod
 - `develop` = feedback rapide, `main` = qualité garantie
