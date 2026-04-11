@@ -306,7 +306,12 @@ matrix:
   service: [user-service, product-service, order-service]
 ```
 
-### Pourquoi CodeQL uniquement sur main
+### Règle CHANGELOG
+- Le fichier `CHANGELOG.md` est à la racine du repo
+- Format : [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+- **Sur chaque PR vers `develop`** : mettre à jour la section `[Unreleased]` avec les changements
+- **Sur chaque PR vers `main`** : renommer `[Unreleased]` avec le numéro de version et la date
+- Catégories : `Added`, `Fixed`, `Changed`, `Removed`, `Infrastructure`
 - CodeQL est lent (5-15 min) — trop lourd pour chaque PR de feature
 - Les vulnérabilités sont traitées sereinement avant prod
 - `develop` = feedback rapide, `main` = qualité garantie
