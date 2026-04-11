@@ -73,11 +73,19 @@ Phase 1 — Core services
 ### Avancement frontend
 - [x] Initialisé — Vue 3 + Vite + TypeScript + Vue Router + Pinia
 - [x] PrimeVue + PrimeIcons installés
-- [ ] Configuration PrimeVue dans main.ts
-- [ ] Router setup
-- [ ] Stores Pinia (auth, products, orders)
-- [ ] Pages : Home, Catalogue, Fiche produit, Panier, Commandes, Profil
-- [ ] Connexion aux services backend via Fetch API natif
+- [x] `main.ts` — PrimeVue Aura theme + Pinia + Router configurés
+- [x] `App.vue` — layout principal + CSS variables K-beauty
+- [x] `router/index.ts` — 7 routes + auth guard (requiresAuth)
+- [x] `stores/auth.ts` — token JWT, isAuthenticated, setToken, logout
+- [x] Views vides créées — HomeView, CatalogueView, ProductView, CartView, OrdersView, ProfileView, LoginView
+- [ ] HomeView — maquette K-beauty luxury editorial
+- [ ] CatalogueView — liste produits avec filtres
+- [ ] ProductView — fiche produit
+- [ ] CartView — panier + commande
+- [ ] OrdersView — historique commandes
+- [ ] ProfileView — compte utilisateur
+- [ ] LoginView — authentification Keycloak
+- [ ] Services API Fetch natif (auth, product, order, user)
 
 ### Avancement order-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
