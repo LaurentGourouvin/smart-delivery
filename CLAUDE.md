@@ -70,8 +70,14 @@ Phase 1 — Core services
 - [x] Tests unitaires — 3 tests assertThatNoException
 - [x] Validé end-to-end — rattrapé tous les anciens messages au démarrage
 
-### En cours
-- [ ] delivery-service — WebSocket, tracking simulé, dernier service
+### Avancement frontend
+- [x] Initialisé — Vue 3 + Vite + TypeScript + Vue Router + Pinia
+- [x] PrimeVue + PrimeIcons installés
+- [ ] Configuration PrimeVue dans main.ts
+- [ ] Router setup
+- [ ] Stores Pinia (auth, products, orders)
+- [ ] Pages : Home, Catalogue, Fiche produit, Panier, Commandes, Profil
+- [ ] Connexion aux services backend via Fetch API natif
 
 ### Avancement order-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
@@ -142,8 +148,12 @@ Tests unitaires `product-service` puis passer à `order-service`
 - **Migrations** : Flyway
 
 ### Frontend
-- **Framework** : React (marché France / startups coréennes) OU Angular 19 (IT shops coréennes)
-- **Décision finale** : à confirmer selon le marché ciblé en priorité
+- **Framework** : Vue 3 + Vite + TypeScript
+- **UI Library** : PrimeVue + PrimeIcons
+- **State Management** : Pinia
+- **Router** : Vue Router 5 (SPA mode)
+- **HTTP Client** : Axios
+- **Port dev** : 3000
 
 ### Infrastructure
 - **Orchestration** : Docker Swarm (pas Kubernetes — décision volontaire pour maîtriser la complexité)
@@ -172,7 +182,7 @@ Tests unitaires `product-service` puis passer à `order-service`
 | `delivery-service` | 8084 | Tracking livraison simulé | WebSocket, `@Scheduled`, Kafka consumer |
 | `notification-service` | 8085 | Email/push/SMS simulés | Kafka consumer pur, pas de BDD |
 | `payment-service` | 8086 | Paiement simulé | Saga pattern (chorégraphie), Kafka |
-| `frontend` | 3000 | Interface utilisateur | React ou Angular 19 |
+| `frontend` | 3000 | Interface utilisateur | Vue 3, Vite, TypeScript, PrimeVue, Pinia |
 
 Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092, mode KRaft — sans Zookeeper), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
 
