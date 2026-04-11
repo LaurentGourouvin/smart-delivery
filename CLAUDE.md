@@ -47,7 +47,10 @@ Phase 1 — Core services
 - [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
 ### En cours
-- [ ] Tests unitaires product-service
+- [ ] order-service — à créer via Spring Initializr
+
+### Prochaine étape
+Créer `order-service` via Spring Initializr → `services/order-service/`
 
 ### Avancement product-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
@@ -62,7 +65,8 @@ Phase 1 — Core services
 - [x] `config/SecurityConfig.java`
 - [x] `exception/` — ProductNotFoundException, CategoryNotFoundException, GlobalExceptionHandler
 - [x] Validé end-to-end — JWT Keycloak → GET /api/products/categories → 8 catégories K-beauty
-- [ ] Tests unitaires
+- [x] Tests unitaires — 8 tests Mockito, mvn test sans Docker
+- [x] `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur Product et Category
 
 ### Bloquant
 - Aucun
@@ -253,6 +257,11 @@ src/main/java/com/smartdelivery/{service}/
 ### Injection de dépendances
 - Toujours par constructeur — jamais `@Autowired` sur les champs
 - Utiliser `@RequiredArgsConstructor` (Lombok) pour réduire le boilerplate
+
+### Entités JPA
+- Toujours ajouter `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur toutes les entités JPA
+- Toujours marquer `id` avec `@EqualsAndHashCode.Include`
+- Raison : évite les références circulaires et les StackOverflowError avec `@Data` + relations JPA
 
 ---
 
