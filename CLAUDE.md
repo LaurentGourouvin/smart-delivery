@@ -17,62 +17,76 @@ Niveau cible : mid+ développeur fullstack orienté Java/Spring Boot.
 ## Status
 
 ### Phase actuelle
-Phase 0 — Documentation et infrastructure de base
+Phase 1 — Core services
 
 ### Fait
-- [x] Repo GitHub créé : `github.com/LaurentGourouvin/smart-delivery`
-- [x] Structure de dossiers initialisée (`services/`, `infra/`, `docs/`, `shared/`, `.github/`)
-- [x] `CLAUDE.md` — contexte complet du projet
-- [x] `README.md` — vitrine GitHub en anglais, badges, Swagger tous services
-- [x] `LICENSE` — MIT
-- [x] `docs/adr/001` — Docker Swarm over Kubernetes
-- [x] `docs/adr/002` — PostgreSQL for all services
-- [x] `docs/adr/003` — Kafka and REST coexistence
-- [x] `docs/adr/004` — Saga choreography over orchestration
-- [x] `docs/adr/005` — Asymmetric JWT with Keycloak JWKS
-- [x] `infra/docker-compose.yml` — stack Phase 1 (Traefik, Keycloak, PostgreSQL, Redis, Kafka, Kafka-UI)
-- [x] `infra/postgres/init.sql` — création des schemas isolés par service
-- [x] `infra/monitoring/prometheus.yml` — config scraping des services Spring Boot
+- [x] Structure du repo
+- [x] docker-compose.yml (Phase 1) — ports liés à 127.0.0.1
+- [x] Documentation (README, ADR, LICENSE)
+- [x] Keycloak configuré et exporté
+  - realm `smartdelivery`
+  - client `smart-delivery-app` (confidential, direct access grants)
+  - import automatique au démarrage via `--import-realm`
+  - realm JSON commité dans `infra/keycloak/smartdelivery-realm.json`
+
+### Avancement user-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Actuator, Springdoc
+- [x] `V1__init_user_service.sql` — tables users + addresses, gen_random_uuid()
+- [x] `docs/MCD.md` — modèle conceptuel de données documenté
+- [x] `entity/User.java` + `entity/Address.java`
+- [x] `repository/UserRepository.java` + `repository/AddressRepository.java`
+- [x] `dto/` — UserResponse, AddressResponse, UpdateUserRequest, CreateAddressRequest
+- [x] `service/UserService.java` — provisioning JWT, gestion profil et adresses
+- [x] `controller/UserController.java` — endpoints REST (/me, /me/addresses)
+- [x] `config/SecurityConfig.java` — stateless, CSRF disabled, OAuth2 JWT
+- [x] `exception/` — UserNotFoundException, AddressNotFoundException, GlobalExceptionHandler
+- [x] Tests unitaires — 6 tests Mockito, mvn test sans Docker
+- [x] maven-failsafe-plugin — séparation unit/intégration
+- [x] Validé end-to-end — JWT Keycloak → provisioning automatique → réponse JSON
+- [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
 ### En cours
-- [ ] user-service — repositories OK, couche service + controllers à faire
+- [ ] order-service — à créer via Spring Initializr
+
+### Prochaine étape
+Créer `order-service` via Spring Initializr → `services/order-service/`
+
+### Avancement product-service
+- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
+- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Actuator, Springdoc
+- [x] `V1__init_product_service.sql` — tables categories + products, K-beauty seed
+- [x] `docs/MCD.md` — modèle conceptuel de données documenté
+- [x] `entity/Category.java` + `entity/Product.java` + `entity/SkinType.java`
+- [x] `repository/CategoryRepository.java` + `repository/ProductRepository.java`
+- [x] `dto/` — CategoryResponse, ProductResponse, CreateProductRequest, UpdateProductRequest, UpdateStockRequest
+- [x] `service/ProductService.java` — logique métier + Optimistic Lock
+- [x] `controller/ProductController.java` — endpoints REST
+- [x] `config/SecurityConfig.java`
+- [x] `exception/` — ProductNotFoundException, CategoryNotFoundException, GlobalExceptionHandler
+- [x] Validé end-to-end — JWT Keycloak → GET /api/products/categories → 8 catégories K-beauty
+- [x] Tests unitaires — 8 tests Mockito, mvn test sans Docker
+- [x] `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur Product et Category
 
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-Tests unitaires + intégration Testcontainers pour `user-service`
-
-### Avancement user-service
-- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
-- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Actuator, Springdoc
-- [x] `V1__init_user_service.sql` — tables users + addresses, contraintes, index
-- [x] `docs/MCD.md` — modèle conceptuel de données documenté
-- [x] `entity/User.java` — entité JPA avec Lombok, @PrePersist, @OneToMany
-- [x] `entity/Address.java` — entité JPA avec @ManyToOne LAZY
-- [x] `repository/UserRepository.java` — findByEmail, findByKeycloakId, existsByEmail
-- [x] `repository/AddressRepository.java` — findByUserId, findByUserIdAndIsDefaultTrue
-- [x] `dto/UserResponse.java` — record lecture utilisateur
-- [x] `dto/AddressResponse.java` — record lecture adresse
-- [x] `dto/UpdateUserRequest.java` — modifier prénom, nom, téléphone
-- [x] `dto/CreateAddressRequest.java` — ajouter une adresse
-- [x] `service/UserService.java` — provisioning JWT, gestion profil et adresses
-- [x] `controller/UserController.java` — endpoints REST (/me, /me/addresses)
-- [x] `config/SecurityConfig.java` — stateless, CSRF disabled, OAuth2 JWT
-- [x] `exception/UserNotFoundException.java`
-- [x] `exception/AddressNotFoundException.java`
-- [x] `exception/GlobalExceptionHandler.java` — ProblemDetail RFC 9457
-- [ ] Tests unitaires + intégration Testcontainers
+Tests unitaires `product-service` puis passer à `order-service`
 
 ### Décisions prises en session (non couvertes par les ADR)
-- ELK Stack reporté en Phase 2 — trop lourd pour démarrer
+- ELK Stack reporté en Phase 2
 - Prometheus + Grafana + Jaeger reportés en Phase 2
-- `docker-stack.yml` (Swarm) reporté après que les services tournent en Compose
+- `docker-stack.yml` (Swarm) reporté en Phase 2
 - Frontend (React vs Angular 19) — décision non encore prise
-- `notification-service` n'a pas de base PostgreSQL — service stateless, Kafka consumer pur
-- Pas de pom.xml parent pour l'instant — chaque service généré indépendamment via Spring Initializr
-- Keycloak comme source de vérité unique pour les rôles et l'auth — pas de duplication locale
-- Package name généré en `user_service` (underscore) par Spring Initializr — conservé tel quel
+- `notification-service` n'a pas de base PostgreSQL — service stateless
+- Pas de pom.xml parent — chaque service généré via Spring Initializr
+- Keycloak comme source de vérité unique pour les rôles et l'auth
+- Package name généré en `user_service` (underscore) par Spring Initializr — conservé
+- Kafka en mode KRaft — Zookeeper supprimé
+- Ports Docker liés à 127.0.0.1 — sécurité dev local
+- Tests d'intégration Testcontainers reportés après validation end-to-end de chaque service
+- `gen_random_uuid()` utilisé à la place de `uuid-ossp` (PostgreSQL 16 natif)
 
 ---
 
@@ -122,7 +136,7 @@ Tests unitaires + intégration Testcontainers pour `user-service`
 | `payment-service` | 8086 | Paiement simulé | Saga pattern (chorégraphie), Kafka |
 | `frontend` | 3000 | Interface utilisateur | React ou Angular 19 |
 
-Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
+Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092, mode KRaft — sans Zookeeper), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
 
 ---
 
@@ -243,6 +257,11 @@ src/main/java/com/smartdelivery/{service}/
 ### Injection de dépendances
 - Toujours par constructeur — jamais `@Autowired` sur les champs
 - Utiliser `@RequiredArgsConstructor` (Lombok) pour réduire le boilerplate
+
+### Entités JPA
+- Toujours ajouter `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur toutes les entités JPA
+- Toujours marquer `id` avec `@EqualsAndHashCode.Include`
+- Raison : évite les références circulaires et les StackOverflowError avec `@Data` + relations JPA
 
 ---
 
