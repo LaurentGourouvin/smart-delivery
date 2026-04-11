@@ -70,7 +70,58 @@ Phase 1 — Core services
 - [x] Tests unitaires — 3 tests assertThatNoException
 - [x] Validé end-to-end — rattrapé tous les anciens messages au démarrage
 
-### Avancement frontend
+## Règles Frontend
+
+### Structure des fichiers
+```
+src/
+├── assets/
+│   └── styles/
+│       ├── variables.css    ← CSS variables K-beauty (couleurs, typo, spacing)
+│       ├── animations.css   ← keyframes réutilisables
+│       └── base.css         ← reset + styles globaux
+├── components/
+│   ├── layout/
+│   │   ├── AppNav.vue       ← navigation globale
+│   │   └── AppFooter.vue    ← footer global
+│   └── [feature]/           ← composants par fonctionnalité
+│       └── FeatureSection.vue
+├── views/                   ← assemblage uniquement, zéro CSS
+│   └── HomeView.vue
+├── stores/                  ← Pinia stores
+├── services/                ← API calls via Fetch natif
+└── router/
+```
+
+### Règles de composants
+- **Views** — assemblage uniquement, zéro CSS, zéro logique métier
+- **Components** — un composant = une responsabilité, CSS scoped
+- **Max 200 lignes par fichier** — au-delà, découper en sous-composants
+- **CSS global** — uniquement dans `assets/styles/`, jamais dans App.vue
+- **CSS scoped** — toujours `<style scoped>` dans les composants
+- **PrimeVue** — pour les composants fonctionnels (inputs, tables, modals, toasts, forms)
+- **CSS custom** — pour le design K-beauty (hero, sections éditoriales)
+
+### Règles de responsive
+- **Mobile first** — écrire d'abord le CSS mobile, puis les breakpoints desktop
+- **Breakpoints** :
+  - Mobile : < 768px
+  - Tablet : 768px - 1024px
+  - Desktop : > 1024px
+- **Toutes les pages doivent avoir une version mobile**
+- **Navigation mobile** — hamburger menu sur mobile
+- **Grid** — passer de multi-colonnes à 1 colonne sur mobile
+
+### HTTP Client
+- **Fetch API natif uniquement** — pas d'Axios (supply chain risk)
+- Les appels API sont dans `src/services/` uniquement
+- Jamais d'appel fetch directement dans un composant ou une view
+
+### Conventions
+- Noms de composants : PascalCase (`AppNav.vue`, `HeroSection.vue`)
+- Noms de fichiers CSS : kebab-case (`variables.css`)
+- Props TypeScript : toujours typées
+- Emits TypeScript : toujours typés
 - [x] Initialisé — Vue 3 + Vite + TypeScript + Vue Router + Pinia
 - [x] PrimeVue + PrimeIcons installés
 - [x] `main.ts` — PrimeVue Aura theme + Pinia + Router configurés
