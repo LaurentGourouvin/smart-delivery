@@ -41,7 +41,7 @@ public class ProductService {
 
     // Products - read
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProduct() {
+    public List<ProductResponse> getAllProducts() {
         return productRepository.findAll()
                 .stream()
                 .map(this::toProductResponse)
