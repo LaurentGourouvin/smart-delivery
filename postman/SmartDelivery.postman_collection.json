@@ -25,54 +25,21 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {
-                  "key": "grant_type",
-                  "value": "password",
-                  "type": "text"
-                },
-                {
-                  "key": "client_id",
-                  "value": "smart-delivery-app",
-                  "type": "text"
-                },
-                {
-                  "key": "client_secret",
-                  "value": "{{client_secret}}",
-                  "type": "text"
-                },
-                {
-                  "key": "username",
-                  "value": "laurent",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "password123",
-                  "type": "text"
-                }
+                { "key": "grant_type", "value": "password", "type": "text" },
+                { "key": "client_id", "value": "smart-delivery-app", "type": "text" },
+                { "key": "client_secret", "value": "{{client_secret}}", "type": "text" },
+                { "key": "username", "value": "laurent", "type": "text" },
+                { "key": "password", "value": "password123", "type": "text" }
               ]
             },
             "url": {
               "raw": "{{keycloak_url}}/realms/smartdelivery/protocol/openid-connect/token",
-              "host": [
-                "{{keycloak_url}}"
-              ],
-              "path": [
-                "realms",
-                "smartdelivery",
-                "protocol",
-                "openid-connect",
-                "token"
-              ]
+              "host": ["{{keycloak_url}}"],
+              "path": ["realms", "smartdelivery", "protocol", "openid-connect", "token"]
             }
           },
           "response": []
@@ -86,22 +53,11 @@
           "name": "Get my profile (GET /me)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{user_service}}/api/users/me",
-              "host": [
-                "{{user_service}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "me"
-              ]
+              "host": ["{{user_service}}"],
+              "path": ["api", "users", "me"]
             }
           },
           "response": []
@@ -111,14 +67,8 @@
           "request": {
             "method": "PUT",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -126,31 +76,33 @@
             },
             "url": {
               "raw": "{{user_service}}/api/users/me",
-              "host": [
-                "{{user_service}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "me"
-              ]
+              "host": ["{{user_service}}"],
+              "path": ["api", "users", "me"]
             }
           },
           "response": []
         },
         {
           "name": "Add address (POST /me/addresses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) {",
+                  "  pm.collectionVariables.set('address_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -158,15 +110,8 @@
             },
             "url": {
               "raw": "{{user_service}}/api/users/me/addresses",
-              "host": [
-                "{{user_service}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "me",
-                "addresses"
-              ]
+              "host": ["{{user_service}}"],
+              "path": ["api", "users", "me", "addresses"]
             }
           },
           "response": []
@@ -175,25 +120,11 @@
           "name": "Set default address (PATCH /me/addresses/:id/default)",
           "request": {
             "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{user_service}}/api/users/me/addresses/ADRESSE_ID/default",
-              "host": [
-                "{{user_service}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "me",
-                "addresses",
-                "ADRESSE_ID",
-                "default"
-              ]
+              "raw": "{{user_service}}/api/users/me/addresses/{{address_id}}/default",
+              "host": ["{{user_service}}"],
+              "path": ["api", "users", "me", "addresses", "{{address_id}}", "default"]
             }
           },
           "response": []
@@ -202,24 +133,11 @@
           "name": "Delete address (DELETE /me/addresses/:id)",
           "request": {
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{user_service}}/api/users/me/addresses/ADRESSE_ID",
-              "host": [
-                "{{user_service}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "me",
-                "addresses",
-                "ADRESSE_ID"
-              ]
+              "raw": "{{user_service}}/api/users/me/addresses/{{address_id}}",
+              "host": ["{{user_service}}"],
+              "path": ["api", "users", "me", "addresses", "{{address_id}}"]
             }
           },
           "response": []
@@ -231,24 +149,27 @@
       "item": [
         {
           "name": "Get all categories (GET /categories)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.length > 0) {",
+                  "  pm.collectionVariables.set('category_id', json[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{product_service}}/api/products/categories",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "categories"
-              ]
+              "host": ["{{product_service}}"],
+              "path": ["api", "products", "categories"]
             }
           },
           "response": []
@@ -257,23 +178,11 @@
           "name": "Get category by slug (GET /categories/:slug)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{product_service}}/api/products/categories/serum",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "categories",
-                "serum"
-              ]
+              "host": ["{{product_service}}"],
+              "path": ["api", "products", "categories", "serum"]
             }
           },
           "response": []
@@ -282,21 +191,11 @@
           "name": "Get all products (GET /products)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{product_service}}/api/products",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ]
+              "host": ["{{product_service}}"],
+              "path": ["api", "products"]
             }
           },
           "response": []
@@ -305,27 +204,12 @@
           "name": "Get products by category",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{product_service}}/api/products?categoryId=CATEGORY_ID",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ],
-              "query": [
-                {
-                  "key": "categoryId",
-                  "value": "CATEGORY_ID"
-                }
-              ]
+              "raw": "{{product_service}}/api/products?categoryId={{category_id}}",
+              "host": ["{{product_service}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "categoryId", "value": "{{category_id}}" }]
             }
           },
           "response": []
@@ -334,27 +218,12 @@
           "name": "Get products by brand",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{product_service}}/api/products?brand=COSRX",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ],
-              "query": [
-                {
-                  "key": "brand",
-                  "value": "COSRX"
-                }
-              ]
+              "host": ["{{product_service}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "brand", "value": "COSRX" }]
             }
           },
           "response": []
@@ -363,27 +232,12 @@
           "name": "Get products by skin type",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{product_service}}/api/products?skinType=OILY",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ],
-              "query": [
-                {
-                  "key": "skinType",
-                  "value": "OILY"
-                }
-              ]
+              "host": ["{{product_service}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "skinType", "value": "OILY" }]
             }
           },
           "response": []
@@ -392,27 +246,12 @@
           "name": "Get products in stock",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
               "raw": "{{product_service}}/api/products?inStock=true",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ],
-              "query": [
-                {
-                  "key": "inStock",
-                  "value": "true"
-                }
-              ]
+              "host": ["{{product_service}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "inStock", "value": "true" }]
             }
           },
           "response": []
@@ -421,53 +260,45 @@
           "name": "Get product by id (GET /products/:id)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{product_service}}/api/products/PRODUCT_ID",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "PRODUCT_ID"
-              ]
+              "raw": "{{product_service}}/api/products/{{product_id}}",
+              "host": ["{{product_service}}"],
+              "path": ["api", "products", "{{product_id}}"]
             }
           },
           "response": []
         },
         {
           "name": "Create product (POST /products)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) {",
+                  "  pm.collectionVariables.set('product_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"categoryId\": \"CATEGORY_ID\",\n  \"name\": \"COSRX Advanced Snail 96 Mucin Power Essence\",\n  \"description\": \"Essence régénérante à base de mucine d'escargot\",\n  \"brand\": \"COSRX\",\n  \"price\": 24.99,\n  \"stock\": 50,\n  \"skinType\": \"ALL\",\n  \"volumeMl\": 100,\n  \"imageUrl\": null\n}"
+              "raw": "{\n  \"categoryId\": \"{{category_id}}\",\n  \"name\": \"COSRX Advanced Snail 96 Mucin Power Essence\",\n  \"description\": \"Essence régénérante à base de mucine d'escargot\",\n  \"brand\": \"COSRX\",\n  \"price\": 24.99,\n  \"stock\": 50,\n  \"skinType\": \"ALL\",\n  \"volumeMl\": 100,\n  \"imageUrl\": null\n}"
             },
             "url": {
               "raw": "{{product_service}}/api/products",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ]
+              "host": ["{{product_service}}"],
+              "path": ["api", "products"]
             }
           },
           "response": []
@@ -477,29 +308,17 @@
           "request": {
             "method": "PUT",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"COSRX Advanced Snail 96 Mucin Power Essence\",\n  \"description\": \"Essence régénérante à base de mucine d'escargot\",\n  \"brand\": \"COSRX\",\n  \"price\": 22.99,\n  \"skinType\": \"ALL\",\n  \"volumeMl\": 100,\n  \"active\": true\n}"
             },
             "url": {
-              "raw": "{{product_service}}/api/products/PRODUCT_ID",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "PRODUCT_ID"
-              ]
+              "raw": "{{product_service}}/api/products/{{product_id}}",
+              "host": ["{{product_service}}"],
+              "path": ["api", "products", "{{product_id}}"]
             }
           },
           "response": []
@@ -509,30 +328,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"quantity\": 100\n}"
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"quantity\": 100\n}" },
             "url": {
-              "raw": "{{product_service}}/api/products/PRODUCT_ID/stock",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "PRODUCT_ID",
-                "stock"
-              ]
+              "raw": "{{product_service}}/api/products/{{product_id}}/stock",
+              "host": ["{{product_service}}"],
+              "path": ["api", "products", "{{product_id}}", "stock"]
             }
           },
           "response": []
@@ -541,30 +344,12 @@
           "name": "Decrement stock (PATCH /products/:id/stock/decrement)",
           "request": {
             "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{product_service}}/api/products/PRODUCT_ID/stock/decrement?quantity=1",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "PRODUCT_ID",
-                "stock",
-                "decrement"
-              ],
-              "query": [
-                {
-                  "key": "quantity",
-                  "value": "1"
-                }
-              ]
+              "raw": "{{product_service}}/api/products/{{product_id}}/stock/decrement?quantity=1",
+              "host": ["{{product_service}}"],
+              "path": ["api", "products", "{{product_id}}", "stock", "decrement"],
+              "query": [{ "key": "quantity", "value": "1" }]
             }
           },
           "response": []
@@ -573,30 +358,97 @@
           "name": "Restore stock (PATCH /products/:id/stock/restore)",
           "request": {
             "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
             "url": {
-              "raw": "{{product_service}}/api/products/PRODUCT_ID/stock/restore?quantity=1",
-              "host": [
-                "{{product_service}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "PRODUCT_ID",
-                "stock",
-                "restore"
-              ],
-              "query": [
-                {
-                  "key": "quantity",
-                  "value": "1"
-                }
-              ]
+              "raw": "{{product_service}}/api/products/{{product_id}}/stock/restore?quantity=1",
+              "host": ["{{product_service}}"],
+              "path": ["api", "products", "{{product_id}}", "stock", "restore"],
+              "query": [{ "key": "quantity", "value": "1" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OrderService",
+      "item": [
+        {
+          "name": "Get my orders (GET /orders/me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{order_service}}/api/orders/me",
+              "host": ["{{order_service}}"],
+              "path": ["api", "orders", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get order by id (GET /orders/:id)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{order_service}}/api/orders/{{order_id}}",
+              "host": ["{{order_service}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create order (POST /orders)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) {",
+                  "  pm.collectionVariables.set('order_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryAddress\": {\n    \"street\": \"1 rue de la Paix\",\n    \"city\": \"Bordeaux\",\n    \"postalCode\": \"33000\",\n    \"country\": \"FR\"\n  },\n  \"items\": [\n    {\n      \"productId\": \"{{product_id}}\",\n      \"quantity\": 2\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{order_service}}/api/orders",
+              "host": ["{{order_service}}"],
+              "path": ["api", "orders"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update order status (PATCH /orders/:id/status)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\"\n}"
+            },
+            "url": {
+              "raw": "{{order_service}}/api/orders/{{order_id}}/status",
+              "host": ["{{order_service}}"],
+              "path": ["api", "orders", "{{order_id}}", "status"]
             }
           },
           "response": []
@@ -607,51 +459,23 @@
   "event": [
     {
       "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
+      "script": { "type": "text/javascript", "exec": [""] }
     },
     {
       "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
+      "script": { "type": "text/javascript", "exec": [""] }
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost"
-    },
-    {
-      "key": "keycloak_url",
-      "value": "http://localhost:8080"
-    },
-    {
-      "key": "token",
-      "value": ""
-    },
-    {
-      "key": "client_secret",
-      "value": "6ilsJ3Si9MUHgpm2a1p8K4QA4z8v9kPg"
-    },
-    {
-      "key": "user_service",
-      "value": ""
-    },
-    {
-      "key": "product_service",
-      "value": ""
-    }
+    { "key": "keycloak_url", "value": "http://localhost:8080" },
+    { "key": "user_service", "value": "http://localhost:8081" },
+    { "key": "product_service", "value": "http://localhost:8083" },
+    { "key": "order_service", "value": "http://localhost:8082" },
+    { "key": "token", "value": "" },
+    { "key": "client_secret", "value": "6ilsJ3Si9MUHgpm2a1p8K4QA4z8v9kPg" },
+    { "key": "product_id", "value": "" },
+    { "key": "category_id", "value": "" },
+    { "key": "order_id", "value": "" },
+    { "key": "address_id", "value": "" }
   ]
 }
