@@ -8,7 +8,31 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### In progress
-- `order-service` — CQRS simplifié + Kafka producer
+- `payment-service` — Saga pattern (choreography)
+- `delivery-service` — WebSocket real-time tracking
+- `notification-service` — Kafka consumer
+
+---
+
+## [0.3.0] — 2026-04-11
+
+### Added
+- `order-service` — gestion du cycle de vie des commandes
+  - Entités `Order`, `OrderItem`, `OrderStatus` (enum)
+  - CQRS simplifié — commandes (write) et queries (read) séparées
+  - `ProductServiceClient` — Anti-Corruption Layer vers `product-service`
+  - Token propagation — JWT utilisateur propagé aux appels inter-services
+  - Fat events Kafka — `OrderCreatedEvent`, `OrderStatusChangedEvent`
+  - Topics Kafka : `order.created`, `order.status-changed`
+  - Endpoints REST : `GET /me`, `GET /:id`, `POST /`, `PATCH /:id/status`
+  - Swagger UI sur `http://localhost:8082/swagger-ui.html`
+  - 6 tests unitaires Mockito (KafkaTemplate + ProductServiceClient mockés)
+  - Validé end-to-end : commande créée → stock décrémenté → event visible Kafka-UI
+- Kafka-UI fonctionnel — listener INTERNAL ajouté pour communication Docker
+- Collection Postman complète — scripts automatiques pour token, product_id, order_id, category_id, address_id
+
+### Fixed
+- Kafka double listener : `PLAINTEXT://localhost:9092` (local) + `INTERNAL://kafka:29092` (Docker)
 
 ---
 
@@ -28,6 +52,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `ci-main.yml` : compile + tests + CodeQL SAST sur PR → main
   - Matrix strategy : exécution parallèle par service
 - Collection Postman complète (user-service + product-service)
+- `CHANGELOG.md` ajouté
 
 ### Fixed
 - `user-service` + `product-service` : `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur toutes les entités JPA
@@ -56,7 +81,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Utilisateur de test : `laurent@smartdelivery.com`
 - Infrastructure Docker Compose Phase 1
   - Traefik, Keycloak, PostgreSQL, Redis, Kafka (KRaft), Kafka-UI
-  - Schemas PostgreSQL isolés par service (`user_service`, `product_service`, etc.)
+  - Schemas PostgreSQL isolés par service
   - Scripts d'initialisation avec permissions par service
 
 ---
