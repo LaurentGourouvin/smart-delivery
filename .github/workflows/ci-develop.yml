@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [user-service, product-service, order-service]
+        service: [user-service, product-service, order-service, payment-service]
 
     steps:
       - name: Checkout
