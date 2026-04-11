@@ -47,32 +47,13 @@ Phase 1 — Core services
 - [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
 ### En cours
-- [ ] order-service — à créer via Spring Initializr
-
-### Prochaine étape
-Créer `order-service` via Spring Initializr → `services/order-service/`
-
-### Avancement product-service
-- [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
-- [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Actuator, Springdoc
-- [x] `V1__init_product_service.sql` — tables categories + products, K-beauty seed
-- [x] `docs/MCD.md` — modèle conceptuel de données documenté
-- [x] `entity/Category.java` + `entity/Product.java` + `entity/SkinType.java`
-- [x] `repository/CategoryRepository.java` + `repository/ProductRepository.java`
-- [x] `dto/` — CategoryResponse, ProductResponse, CreateProductRequest, UpdateProductRequest, UpdateStockRequest
-- [x] `service/ProductService.java` — logique métier + Optimistic Lock
-- [x] `controller/ProductController.java` — endpoints REST
-- [x] `config/SecurityConfig.java`
-- [x] `exception/` — ProductNotFoundException, CategoryNotFoundException, GlobalExceptionHandler
-- [x] Validé end-to-end — JWT Keycloak → GET /api/products/categories → 8 catégories K-beauty
-- [x] Tests unitaires — 8 tests Mockito, mvn test sans Docker
-- [x] `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur Product et Category
+- [ ] product-service — à créer via Spring Initializr
 
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-Tests unitaires `product-service` puis passer à `order-service`
+Créer `product-service` via Spring Initializr → `services/product-service/`
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2
@@ -258,11 +239,6 @@ src/main/java/com/smartdelivery/{service}/
 - Toujours par constructeur — jamais `@Autowired` sur les champs
 - Utiliser `@RequiredArgsConstructor` (Lombok) pour réduire le boilerplate
 
-### Entités JPA
-- Toujours ajouter `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur toutes les entités JPA
-- Toujours marquer `id` avec `@EqualsAndHashCode.Include`
-- Raison : évite les références circulaires et les StackOverflowError avec `@Data` + relations JPA
-
 ---
 
 ## Ce que Claude ne doit pas faire
@@ -280,36 +256,7 @@ src/main/java/com/smartdelivery/{service}/
 
 ---
 
-## CI/CD
-
-### Stratégie de branches
-```
-feature/*  →  develop  →  main
-```
-
-### Pipelines GitHub Actions
-
-**`ci-develop.yml`** — déclenché sur PR vers `develop`
-- Compile + `mvn test` (tests unitaires uniquement, pas de Docker)
-- Matrix strategy : tourne en parallèle pour chaque service
-- Objectif : feedback rapide, ne pas casser le build
-
-**`ci-main.yml`** — déclenché sur PR vers `main`
-- Compile + `mvn test`
-- CodeQL SAST (analyse de sécurité statique)
-- Objectif : quality gate complète avant prod
-
-### Ajouter un nouveau service aux pipelines
-Dans les deux fichiers `ci-develop.yml` et `ci-main.yml`, ajouter le service dans la matrix :
-```yaml
-matrix:
-  service: [user-service, product-service, order-service]
-```
-
-### Pourquoi CodeQL uniquement sur main
-- CodeQL est lent (5-15 min) — trop lourd pour chaque PR de feature
-- Les vulnérabilités sont traitées sereinement avant prod
-- `develop` = feedback rapide, `main` = qualité garantie
+## Commandes utiles
 
 ```bash
 # Démarrer l'environnement de dev local

@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Spring Boot Actuator expose les métriques sur /actuator/prometheus
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['host.docker.internal:8081']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'order-service'
+    static_configs:
+      - targets: ['host.docker.internal:8082']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'product-service'
+    static_configs:
+      - targets: ['host.docker.internal:8083']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'delivery-service'
+    static_configs:
+      - targets: ['host.docker.internal:8084']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'notification-service'
+    static_configs:
+      - targets: ['host.docker.internal:8085']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'payment-service'
+    static_configs:
+      - targets: ['host.docker.internal:8086']
+    metrics_path: '/actuator/prometheus'

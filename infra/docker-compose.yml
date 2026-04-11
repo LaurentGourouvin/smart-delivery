@@ -1,0 +1,165 @@
+services:
+
+  # ─────────────────────────────────────────
+  # TRAEFIK — API Gateway
+  # ─────────────────────────────────────────
+  traefik:
+    image: traefik:v3.0
+    container_name: sd-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8090:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - sd-network
+
+  # ─────────────────────────────────────────
+  # KEYCLOAK — Identity Provider (OAuth2/OIDC)
+  # ─────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: sd-keycloak
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    volumes:
+      - ./keycloak/smartdelivery-realm.json:/opt/keycloak/data/import/smartdelivery-realm.json
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - sd-network
+
+  keycloak-db:
+    image: postgres:16-alpine
+    container_name: sd-keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sd-network
+
+  # ─────────────────────────────────────────
+  # POSTGRESQL — une instance, un schema par service
+  # ─────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: sd-postgres
+    environment:
+      POSTGRES_USER: smartdelivery
+      POSTGRES_PASSWORD: smartdelivery
+      POSTGRES_DB: smartdelivery
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartdelivery"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sd-network
+
+  # ─────────────────────────────────────────
+  # REDIS — Cache et sessions
+  # ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: sd-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sd-network
+
+  # ─────────────────────────────────────────
+  # KAFKA — KRaft mode (sans Zookeeper)
+  # ─────────────────────────────────────────
+  kafka:
+    image: apache/kafka:latest
+    container_name: sd-kafka
+    ports:
+      - "127.0.0.1:9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - sd-network
+
+  # ─────────────────────────────────────────
+  # KAFKA UI — Visualiser les topics et messages
+  # ─────────────────────────────────────────
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: sd-kafka-ui
+    ports:
+      - "127.0.0.1:9093:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: smartdelivery
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - sd-network
+
+# ─────────────────────────────────────────
+# NETWORKS
+# ─────────────────────────────────────────
+networks:
+  sd-network:
+    driver: bridge
+
+# ─────────────────────────────────────────
+# VOLUMES
+# ─────────────────────────────────────────
+volumes:
+  postgres-data:
+  keycloak-db-data:
+  redis-data:
+  kafka-data:
