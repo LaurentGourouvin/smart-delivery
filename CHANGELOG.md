@@ -8,9 +8,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### In progress
-- `payment-service` — Saga pattern (choreography)
+- `notification-service` — Kafka consumer pur, pas de BDD
 - `delivery-service` — WebSocket real-time tracking
-- `notification-service` — Kafka consumer
+
+---
+
+## [0.4.0] — 2026-04-11
+
+### Added
+- `payment-service` — Saga pattern complet
+  - `@KafkaListener` sur `order.created` — premier vrai consumer Kafka
+  - Simulation 90% succès / 10% échec aléatoire
+  - Idempotence via `existsByOrderId` — protection contre les doublons Kafka
+  - Publie `payment.succeeded` ou `payment.failed`
+  - `PaymentController` — GET `/api/payments/order/:orderId`
+  - 4 tests unitaires Mockito (idempotence, success, failure)
+  - Validé end-to-end : 5 commandes → 4 succeeded + 1 failed
+- Architecture hexagonale — discussion et documentation du pattern Ports & Adapters
+- Anti-Corruption Layer pattern documenté (`ProductServiceClient`, `StripeClient` concept)
+
+### Fixed
+- Kafka deserialization : `spring.json.value.default.type` ajouté pour les consumers sans type headers
 
 ---
 
