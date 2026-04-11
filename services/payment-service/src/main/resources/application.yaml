@@ -39,6 +39,7 @@ spring:
         spring.json.trusted.packages: "com.smartdelivery.payment_service.event"
         spring.json.add.type.headers: false
         spring.json.use.type.headers: false
+        spring.json.value.default.type: com.smartdelivery.payment_service.event.OrderCreatedEvent
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
