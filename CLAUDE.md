@@ -47,7 +47,7 @@ Phase 1 — Core services
 - [ ] Tests d'intégration Testcontainers (`*IT.java`) — mvn verify
 
 ### En cours
-- [ ] product-service — service + controller + exceptions à faire
+- [ ] Tests unitaires product-service
 
 ### Avancement product-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
@@ -57,17 +57,18 @@ Phase 1 — Core services
 - [x] `entity/Category.java` + `entity/Product.java` + `entity/SkinType.java`
 - [x] `repository/CategoryRepository.java` + `repository/ProductRepository.java`
 - [x] `dto/` — CategoryResponse, ProductResponse, CreateProductRequest, UpdateProductRequest, UpdateStockRequest
-- [ ] `service/ProductService.java` — logique métier + Optimistic Lock
-- [ ] `controller/ProductController.java` — endpoints REST
-- [ ] `config/SecurityConfig.java`
-- [ ] `exception/` — ProductNotFoundException, CategoryNotFoundException, GlobalExceptionHandler
+- [x] `service/ProductService.java` — logique métier + Optimistic Lock
+- [x] `controller/ProductController.java` — endpoints REST
+- [x] `config/SecurityConfig.java`
+- [x] `exception/` — ProductNotFoundException, CategoryNotFoundException, GlobalExceptionHandler
+- [x] Validé end-to-end — JWT Keycloak → GET /api/products/categories → 8 catégories K-beauty
 - [ ] Tests unitaires
 
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-Créer `service/ProductService.java` — logique métier + Optimistic Lock
+Tests unitaires `product-service` puis passer à `order-service`
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2
