@@ -42,7 +42,7 @@ public class ProductService {
     // Products - read
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
+        return productRepository.findByActiveTrue()
                 .stream()
                 .map(this::toProductResponse)
                 .toList();
@@ -50,7 +50,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductResponse getProductById(UUID id) {
-        return productRepository.findById(id)
+        return productRepository.findByIdAndActiveTrue(id)
                 .map(this::toProductResponse)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
