@@ -1,15 +1,11 @@
-server:
-  port: 8084
-
 spring:
   application:
     name: delivery-service
 
-  # ── PostgreSQL ──────────────────────────────────────────────
   datasource:
-    url: jdbc:postgresql://localhost:5432/smartdelivery
-    username: delivery_user
-    password: delivery_pass
+    url: jdbc:postgresql://localhost:5432/smartdelivery?currentSchema=delivery_service
+    username: delivery_svc
+    password: delivery_svc_pass
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -19,15 +15,19 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        default_schema: delivery_service
+        format_sql: true
 
-  # ── Flyway ──────────────────────────────────────────────────
   flyway:
     enabled: true
     schemas: delivery_service
-    default-schema: delivery_service
+    locations: classpath:db/migration
 
-  # ── Kafka ───────────────────────────────────────────────────
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/smartdelivery/protocol/openid-connect/certs
+
   kafka:
     bootstrap-servers: localhost:9092
 
@@ -43,30 +43,26 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
 
-  # ── OAuth2 / Keycloak JWT ───────────────────────────────────
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8080/realms/smartdelivery/protocol/openid-connect/certs
+server:
+  port: 8084
 
 # ── Simulation livraison ────────────────────────────────────
 delivery:
   simulation:
     delay-seconds: 30
 
-# ── Actuator ────────────────────────────────────────────────
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
+        include: health,info,prometheus
   endpoint:
     health:
       show-details: always
 
-# ── Springdoc / Swagger ─────────────────────────────────────
 springdoc:
   api-docs:
     path: /api-docs
