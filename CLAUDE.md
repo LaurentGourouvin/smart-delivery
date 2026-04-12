@@ -99,8 +99,9 @@ src/
 - **Max 200 lignes par fichier** — au-delà, découper en sous-composants
 - **CSS global** — uniquement dans `assets/styles/`, jamais dans App.vue
 - **CSS scoped** — toujours `<style scoped>` dans les composants
-- **PrimeVue** — pour les composants fonctionnels (inputs, tables, modals, toasts, forms)
-- **CSS custom** — pour le design K-beauty (hero, sections éditoriales)
+- **PrimeVue** — composants complexes uniquement (DataTable, Toast, Dialog, Calendar) — jamais pour les inputs/boutons dont le design est custom K-beauty
+- **Navigation** — toujours `RouterLink` ou `router.push()`, jamais de `<a href>`
+- **Phase statique** — pas de logique métier dans les views/components pendant la phase design
 
 ### Règles de responsive
 - **Mobile first** — écrire d'abord le CSS mobile, puis les breakpoints desktop
@@ -208,10 +209,10 @@ Tests unitaires `product-service` puis passer à `order-service`
 
 ### Frontend
 - **Framework** : Vue 3 + Vite + TypeScript
-- **UI Library** : PrimeVue + PrimeIcons
+- **UI Library** : PrimeVue + PrimeIcons — composants complexes uniquement (DataTable, Toast, Dialog, Calendar)
 - **State Management** : Pinia
 - **Router** : Vue Router 5 (SPA mode)
-- **HTTP Client** : Axios
+- **HTTP Client** : Fetch API natif — pas d'Axios (supply chain risk)
 - **Port dev** : 3000
 
 ### Infrastructure
