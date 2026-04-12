@@ -1,19 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const menuOpen = ref(false)
+const scrolled = ref(false)
+
+// La nav est transparente uniquement sur la home, pas scrollée
+const isTransparent = computed(() => route.path === '/' && !scrolled.value)
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
 }
+
+function onScroll() {
+  scrolled.value = window.scrollY > 60
+}
+
+onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
 
 <template>
-  <nav class="nav">
+  <nav class="nav" :class="{ 'nav--solid': !isTransparent }">
     <div class="nav-logo" @click="router.push('/')">
       Smart<span>Delivery</span>
     </div>
@@ -60,9 +72,16 @@ function toggleMenu() {
 .nav {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 100;
+  height: 80px;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 2rem 4rem;
+  padding: 0 4rem;
   background: transparent;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.nav--solid {
+  background: var(--ivory);
+  box-shadow: 0 1px 0 rgba(26, 22, 20, 0.08);
 }
 
 .nav-logo {

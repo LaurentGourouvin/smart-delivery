@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import AppNav from '@/components/layout/AppNav.vue'
 import LoginLeft from '@/components/login/LoginLeft.vue'
 import LoginRight from '@/components/login/LoginRight.vue'
 </script>
 
 <template>
-  <AppNav />
   <div class="login-page">
     <LoginLeft />
     <LoginRight />
@@ -15,6 +13,7 @@ import LoginRight from '@/components/login/LoginRight.vue'
 <style scoped>
 .login-page {
   min-height: 100vh;
+  padding-top: 80px; /* compense AppNav fixe global */
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
