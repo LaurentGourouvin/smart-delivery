@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <rect width="200" height="280" fill="#EDE8F5"/>
+  <rect x="70" y="70" width="60" height="160" rx="30" fill="#D0C8E8" stroke="#6B4A9A" stroke-width="1.5"/>
+  <!-- Bouchon haut -->
+  <rect x="76" y="52" width="48" height="22" rx="11" fill="#6B4A9A"/>
+  <!-- Reflet -->
+  <rect x="75" y="80" width="10" height="80" rx="5" fill="white" opacity="0.3"/>
+  <!-- SPF badge -->
+  <circle cx="100" cy="105" r="18" fill="#6B4A9A" opacity="0.9"/>
+  <text x="100" y="102" font-family="Arial,sans-serif" font-size="6" font-weight="bold" fill="white" text-anchor="middle">SPF</text>
+  <text x="100" y="113" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="white" text-anchor="middle">50+</text>
+  <!-- Label -->
+  <text x="100" y="150" font-family="Georgia,serif" font-size="7" font-weight="bold" fill="#1A1614" text-anchor="middle">SOME BY MI</text>
+  <line x1="78" y1="155" x2="122" y2="155" stroke="#6B4A9A" stroke-width="0.8"/>
+  <text x="100" y="167" font-family="Georgia,serif" font-size="5" fill="#1A1614" text-anchor="middle">Yuja Niacin Anti</text>
+</svg>

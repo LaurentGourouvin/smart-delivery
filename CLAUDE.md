@@ -142,11 +142,22 @@ Phase 3 — Frontend Vue 3
 - [ ] Services API Fetch natif (auth, product, order, user)
 - [ ] Store Pinia panier — connecter ProductCard → CartView
 
+### Avancement Seeding BDD
+- [x] `V2__seed_products.sql` — 80 produits K-beauty réels (8 marques × 8 catégories)
+  - Marques : COSRX, Laneige, Innisfree, Sulwhasoo, Some By Mi, Missha, Klairs, Etude
+  - Catégories : Sérum, Crème, Toner, Masque, Essence, Nettoyant, Crème solaire, Contour des yeux
+  - Champs renseignés : name, description, brand, price, stock, image_url, skin_type, volume_ml
+  - INSERT via JOIN sur categories.slug — pas d'UUID hardcodé
+- [x] 80 SVGs custom générés — un par produit, aux couleurs de chaque marque
+  - 6 formes : flacon pompe, tube, pot, flacon toner, tube solaire, pipette œil, sachet masque
+  - Placés dans `frontend/public/images/products/{slug}.svg`
+  - image_url dans SQL : `/images/products/{slug}.svg`
+
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-Phase 4 — Connecter les interfaces au backend (stores Pinia + services Fetch natif)
+`delivery-service` — dernier service backend (WebSocket + @Scheduled + Kafka consumer)
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2

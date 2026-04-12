@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <rect width="200" height="280" fill="#E8F0E8"/>
+  <!-- Corps flacon ovale -->
+  <ellipse cx="100" cy="180" rx="38" ry="65" fill="#C0D8C0" stroke="#4A7A4A" stroke-width="1.5"/>
+  <!-- Col -->
+  <rect x="88" y="95" width="24" height="30" rx="4" fill="#C0D8C0" stroke="#4A7A4A" stroke-width="1.5"/>
+  <!-- Bulbe pipette -->
+  <ellipse cx="100" cy="75" rx="16" ry="22" fill="#4A7A4A"/>
+  <!-- Tige pipette -->
+  <rect x="98" y="97" width="4" height="40" rx="2" fill="#4A7A4A" opacity="0.5"/>
+  <!-- Reflet -->
+  <ellipse cx="88" cy="165" rx="6" ry="30" fill="white" opacity="0.25"/>
+  <!-- Label -->
+  <rect x="70" y="148" width="60" height="65" rx="2" fill="white" opacity="0.6"/>
+  <text x="100" y="168" font-family="Georgia,serif" font-size="6.5" font-weight="bold" fill="#1A1614" text-anchor="middle">INNISFREE</text>
+  <line x1="76" y1="173" x2="124" y2="173" stroke="#4A7A4A" stroke-width="0.8"/>
+  <text x="100" y="184" font-family="Georgia,serif" font-size="5" fill="#1A1614" text-anchor="middle">Green Tea Seed E</text>
+  <text x="100" y="195" font-family="Georgia,serif" font-size="4.5" fill="#1A1614" text-anchor="middle">ye Cream</text>
+</svg>
