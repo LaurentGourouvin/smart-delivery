@@ -1,41 +1,27 @@
 package com.smartdelivery.delivery_service.entity;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(
-        name = "deliveries",
-        schema = "delivery_service",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_deliveries_order_id",  columnNames = "order_id"),
-                @UniqueConstraint(name = "uq_deliveries_tracking",  columnNames = "tracking_number")
-        }
-)
-@Getter
-@Setter
+@Table(name = "deliveries")
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Delivery {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
-    @Column(nullable = false, updatable = false)
     private UUID id;
 
-    // Référence logique vers order-service — pas de FK physique
+    // Référence logique vers order-service — pas de FK physique (isolation microservices)
     @Column(name = "order_id", nullable = false, updatable = false)
     private UUID orderId;
 
@@ -44,11 +30,13 @@ public class Delivery {
     private UUID userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "delivery_status")
-    private DeliveryStatus status;
+    @Column(name = "status", nullable = false, columnDefinition = "delivery_status")
+    @Builder.Default
+    private DeliveryStatus status = DeliveryStatus.ASSIGNED;
 
-    @Column(nullable = false)
-    private String carrier;
+    @Column(name = "carrier", nullable = false)
+    @Builder.Default
+    private String carrier = "SmartExpress";
 
     @Column(name = "tracking_number", nullable = false)
     private String trackingNumber;
@@ -70,15 +58,19 @@ public class Delivery {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
-    void prePersist() {
+    protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         this.createdAt  = now;
         this.assignedAt = now;
         this.updatedAt  = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
