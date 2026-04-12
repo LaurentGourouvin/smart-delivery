@@ -3,10 +3,11 @@
 > E-commerce order management platform built with a microservices architecture.
 > Showcase project demonstrating distributed systems patterns, event-driven architecture, and DevOps practices.
 
-![CI](https://github.com/LaurentGourouvin/smart-delivery/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/LaurentGourouvin/smart-delivery/actions/workflows/ci-main.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)
-![Kafka](https://img.shields.io/badge/Apache%20Kafka-3.x-black)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.x-green)
+![Kafka](https://img.shields.io/badge/Apache%20Kafka-KRaft-black)
+![Vue](https://img.shields.io/badge/Vue-3.x-brightgreen)
 ![Docker](https://img.shields.io/badge/Docker%20Swarm-ready-blue)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
@@ -14,14 +15,14 @@
 
 ## Overview
 
-SmartDelivery is a fully simulated e-commerce delivery platform. Users can browse products, place orders, track deliveries in real time, and receive notifications — all handled by six independent microservices communicating via REST and Kafka events.
+SmartDelivery is a fully simulated K-beauty e-commerce delivery platform. Users can browse products, place orders, track deliveries in real time, and receive notifications — all handled by six independent microservices communicating via REST and Kafka events.
 
 The project is designed as a **technical showcase** covering:
 - Microservices architecture with clear domain boundaries
-- Event-driven communication (Apache Kafka)
-- Distributed transaction management (Saga pattern)
+- Event-driven communication (Apache Kafka — KRaft mode)
+- Distributed transaction management (Saga pattern — choreography)
 - Real-time delivery tracking (WebSocket)
-- Centralized authentication and authorization (Keycloak / OAuth2 / JWT)
+- Centralized authentication and authorization (Keycloak / OAuth2 / JWT RS256)
 - Full observability stack (Prometheus, Grafana, Jaeger, ELK)
 - Container orchestration (Docker Swarm)
 
@@ -32,7 +33,7 @@ The project is designed as a **technical showcase** covering:
 ```
 ┌─────────────────────────────────────────────────────┐
 │                    Clients                          │
-│              React / Angular 19                     │
+│           Vue 3 + Vite + TypeScript                 │
 └────────────────────┬────────────────────────────────┘
                      │ HTTPS
 ┌────────────────────▼────────────────────────────────┐
@@ -50,7 +51,8 @@ The project is designed as a **technical showcase** covering:
         ┌──────────▼──────────┐
         │   Apache Kafka      │
         │  order.created      │
-        │  payment.processed  │
+        │  payment.succeeded  │
+        │  payment.failed     │
         │  delivery.updated   │
         └──────┬──────────────┘
                │
@@ -69,36 +71,40 @@ The project is designed as a **technical showcase** covering:
 
 | Service | Port | Responsibility | Key patterns |
 |---|---|---|---|
-| `user-service` | 8081 | User accounts, authentication, RBAC | OAuth2, Keycloak, Spring Security |
-| `order-service` | 8082 | Order lifecycle management | CQRS, Event Sourcing, Kafka producer |
+| `user-service` | 8081 | User accounts, authentication | OAuth2, Keycloak, Spring Security |
+| `order-service` | 8082 | Order lifecycle management | CQRS, Kafka producer, Anti-Corruption Layer |
 | `product-service` | 8083 | Product catalogue, stock management | Optimistic Lock (`@Version`) |
 | `delivery-service` | 8084 | Simulated real-time delivery tracking | WebSocket, `@Scheduled`, Kafka consumer |
-| `notification-service` | 8085 | Email / push notifications | Kafka consumer, stateless |
-| `payment-service` | 8086 | Simulated payment processing | Saga pattern (choreography) |
+| `notification-service` | 8085 | Email / push notifications | Kafka consumer pur, stateless, no DB |
+| `payment-service` | 8086 | Simulated payment processing | Saga pattern (choreography), idempotence |
 
 ---
 
 ## Tech Stack
 
 ### Backend
-- **Java 21** + **Spring Boot 3.x** — all services
+- **Java 21** + **Spring Boot 3.5.x** — all services
 - **Spring Data JPA** + **Hibernate** + **Flyway** — persistence and migrations
-- **Spring Security** + **Keycloak** — OAuth2 / OIDC / JWT (RS256)
-- **Spring Kafka** — event-driven communication
+- **Spring Security** + **Keycloak** — OAuth2 / OIDC / JWT (RS256, JWKS)
+- **Spring Kafka** — event-driven communication (KRaft mode, no Zookeeper)
 - **Spring WebSocket** — real-time delivery tracking
-- **PostgreSQL** — all service databases (one schema per service)
-- **Redis** — shared cache and session store
-- **Springdoc OpenAPI** — API documentation exposed by every service
+- **PostgreSQL 16** — all service databases (one schema per service)
+- **Redis 7** — shared cache and session store
+- **Springdoc OpenAPI** — Swagger UI exposed by every service
 
 ### Frontend
-- **React** or **Angular 19** (depending on target market)
+- **Vue 3** + **Vite** + **TypeScript**
+- **PrimeVue** + **PrimeIcons** — UI component library
+- **Pinia** — state management
+- **Vue Router 5** — SPA routing
+- **Fetch API** — native HTTP client (zero dependency)
 
 ### Infrastructure
 - **Docker Swarm** — container orchestration
 - **Traefik** — API Gateway, routing, SSL termination
-- **Apache Kafka** (Bitnami) — event bus
-- **Keycloak** — identity provider
-- **GitHub Actions** — CI/CD pipelines
+- **Apache Kafka** (KRaft) — event bus, no Zookeeper
+- **Keycloak 24** — identity provider
+- **GitHub Actions** — CI/CD pipelines (unit tests + CodeQL SAST)
 - **GitHub Container Registry** — Docker image storage
 
 ### Observability
@@ -124,9 +130,10 @@ Key technical decisions are documented in [`docs/adr/`](docs/adr/):
 
 ### Prerequisites
 
-- Docker Desktop (with Swarm mode or Compose)
+- Docker Desktop
 - Java 21
 - Maven 3.9+
+- Node.js 20+
 
 ### Run locally (Docker Compose)
 
@@ -135,11 +142,14 @@ Key technical decisions are documented in [`docs/adr/`](docs/adr/):
 git clone https://github.com/LaurentGourouvin/smart-delivery
 cd smart-delivery
 
-# Start all services and infrastructure
+# Start infrastructure (Kafka, PostgreSQL, Keycloak, Redis, Kafka-UI)
 docker compose -f infra/docker-compose.yml up -d
 
-# Check running services
-docker compose -f infra/docker-compose.yml ps
+# Start each service from IntelliJ or via Maven
+cd services/user-service && mvn spring-boot:run
+
+# Start the frontend
+cd frontend && npm install && npm run dev
 ```
 
 Services will be available at:
@@ -149,27 +159,11 @@ Services will be available at:
 | Frontend | http://localhost:3000 |
 | Traefik dashboard | http://localhost:8090 |
 | Keycloak | http://localhost:8080 |
-| Grafana | http://localhost:3001 |
-| Jaeger UI | http://localhost:16686 |
+| Kafka-UI | http://localhost:9093 |
 | Swagger — user-service | http://localhost:8081/swagger-ui.html |
 | Swagger — order-service | http://localhost:8082/swagger-ui.html |
 | Swagger — product-service | http://localhost:8083/swagger-ui.html |
-| Swagger — delivery-service | http://localhost:8084/swagger-ui.html |
-| Swagger — notification-service | http://localhost:8085/swagger-ui.html |
 | Swagger — payment-service | http://localhost:8086/swagger-ui.html |
-
-### Deploy on Docker Swarm
-
-```bash
-# Initialize Swarm (once)
-docker swarm init
-
-# Deploy the full stack
-docker stack deploy -c infra/docker-stack.yml smartdelivery
-
-# Check services
-docker service ls
-```
 
 ---
 
@@ -179,17 +173,18 @@ docker service ls
 
 ```
 User → POST /api/orders
-     → order-service checks stock (REST → product-service)
+     → order-service fetches product (REST → product-service)
+     → order-service decrements stock (REST → product-service)
      → order-service creates order
-     → Kafka: order.created
-         ├→ payment-service processes payment (Saga)
-         │      → Kafka: payment.succeeded
+     → Kafka: order.created (fat event)
+         ├→ payment-service processes payment (Saga choreography)
+         │      → Kafka: payment.succeeded (90%)
          │           → order-service confirms order
          │           → delivery-service assigns delivery
          │      → Kafka: payment.failed (10% random)
          │           → product-service restores stock
          │           → order-service cancels order
-         └→ notification-service sends email
+         └→ notification-service sends email confirmation
 ```
 
 ### Real-time delivery tracking
@@ -216,20 +211,19 @@ smart-delivery/
 │   ├── delivery-service/
 │   ├── notification-service/
 │   └── payment-service/
-├── frontend/
+├── frontend/              # Vue 3 + Vite + TypeScript
 ├── infra/
 │   ├── docker-compose.yml
 │   ├── docker-stack.yml
-│   ├── traefik/
+│   ├── keycloak/
 │   └── monitoring/
-├── shared/                  # Shared Kafka event DTOs (Maven local dependency)
 ├── docs/
-│   ├── architecture.md
 │   └── adr/
 ├── .github/
 │   └── workflows/
-├── pom.xml                  # Parent POM
-├── CLAUDE.md                # AI assistant context
+│       ├── ci-develop.yml  # compile + tests on PR → develop
+│       └── ci-main.yml     # compile + tests + CodeQL on PR → main
+├── CLAUDE.md
 └── README.md
 ```
 
@@ -238,7 +232,7 @@ smart-delivery/
 ## Testing
 
 ```bash
-# Run tests for a specific service
+# Run unit tests for a specific service
 cd services/order-service
 mvn test
 
@@ -247,8 +241,8 @@ mvn verify
 ```
 
 - **Unit tests** : JUnit 5 + Mockito
-- **Integration tests** : Testcontainers (PostgreSQL + Kafka in ephemeral containers)
-- **Target coverage** : 80%
+- **Integration tests** : Testcontainers (PostgreSQL + Kafka)
+- **SAST** : CodeQL on every PR → main
 
 ---
 
@@ -256,24 +250,29 @@ mvn verify
 
 This project is a demo — no real payments or deliveries are processed.
 
-**Payment** : 90% success / 10% random failure to demonstrate the Saga compensation flow. No banking data is stored — RGPD / PCI-DSS compliant by design.
+**Payment** : 90% success / 10% random failure to demonstrate the Saga compensation flow.
+No banking data is stored — RGPD / PCI-DSS compliant by design.
 
-**Delivery** : automated `@Scheduled` job advances delivery status every N seconds (configurable via `delivery.simulation.delay-seconds`).
+**Delivery** : automated `@Scheduled` job advances delivery status every N seconds
+(configurable via `delivery.simulation.delay-seconds`).
+
+**Notifications** : emails are simulated in logs — no real email provider configured.
 
 ---
 
 ## Roadmap
 
-- [x] Project architecture and documentation
-- [ ] Phase 1 — Core services (user, order, product) + Kafka + Docker Compose
-- [ ] Phase 2 — Delivery tracking (WebSocket) + Payment Saga + Observability
-- [ ] Phase 3 — CI/CD GitHub Actions + Docker Swarm deployment + Frontend
+- [x] Project architecture and ADR documentation
+- [x] Phase 1 — Core services (user, product, order) + Kafka + Docker Compose
+- [x] Phase 2 — Payment Saga + Notification service + CI/CD GitHub Actions
+- [ ] Phase 3 — Delivery tracking (WebSocket) + Frontend Vue 3
+- [ ] Phase 4 — Docker Swarm deployment + Observability (Prometheus, Grafana, Jaeger)
 
 ---
 
 ## Author
 
-**Laurent** — Fullstack developer (Java / Spring Boot · TypeScript · Angular · React)
+**Laurent** — Fullstack developer (Java / Spring Boot · Vue 3 · TypeScript)
 Bordeaux, France · Targeting South Korea 2027
 
 [![GitHub](https://img.shields.io/badge/GitHub-LaurentGourouvin-black)](https://github.com/LaurentGourouvin)

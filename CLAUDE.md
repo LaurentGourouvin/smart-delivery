@@ -17,7 +17,7 @@ Niveau cible : mid+ développeur fullstack orienté Java/Spring Boot.
 ## Status
 
 ### Phase actuelle
-Phase 1 — Core services
+Phase 3 — Frontend Vue 3
 
 ### Fait
 - [x] Structure du repo
@@ -70,9 +70,6 @@ Phase 1 — Core services
 - [x] Tests unitaires — 3 tests assertThatNoException
 - [x] Validé end-to-end — rattrapé tous les anciens messages au démarrage
 
-### En cours
-- [ ] delivery-service — WebSocket, tracking simulé, dernier service
-
 ### Avancement order-service
 - [x] Généré via Spring Initializr (Spring Boot 3.5.x, Java 21)
 - [x] `application.yml` — datasource, Flyway, Keycloak JWKS, Kafka, Actuator, Springdoc
@@ -82,7 +79,7 @@ Phase 1 — Core services
 - [x] `repository/OrderRepository.java` + `repository/OrderItemRepository.java`
 - [x] `dto/` — OrderResponse, OrderItemResponse, CreateOrderRequest, UpdateOrderStatusRequest, DeliveryAddressRequest, OrderItemRequest
 - [x] `event/` — OrderCreatedEvent, OrderItemEvent, OrderStatusChangedEvent (fat events)
-- [x] `client/ProductServiceClient.java` — Anti-Corruption Layer vers product-service
+- [x] `client/ProductServiceClient.java` — Anti-Correction Layer vers product-service
 - [x] `service/OrderService.java` — CQRS simplifié, Kafka producer, token propagation
 - [x] `controller/OrderController.java` — endpoints REST
 - [x] `config/SecurityConfig.java` + `config/RestClientConfig.java`
@@ -106,17 +103,56 @@ Phase 1 — Core services
 - [x] Tests unitaires — 8 tests Mockito, mvn test sans Docker
 - [x] `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` sur Product et Category
 
+### Avancement Frontend
+- [x] Initialisé — Vue 3 + Vite + TypeScript + Vue Router + Pinia
+- [x] PrimeVue + PrimeIcons installés
+- [x] `main.ts` — PrimeVue Aura theme + Pinia + Router configurés
+- [x] `App.vue` — layout global avec `AppNav` monté une seule fois + `RouterView`
+- [x] `router/index.ts` — 7 routes + auth guard (requiresAuth)
+- [x] `stores/auth.ts` — token JWT, isAuthenticated, setToken, logout
+- [x] `assets/styles/variables.css` — CSS variables K-beauty (ivory, cherry, ink, sage, gold)
+- [x] `assets/styles/animations.css` — keyframes (float, pulse, spin, marquee, fadeUp)
+- [x] `assets/styles/base.css` — reset + styles globaux + section-label/section-title
+- [x] `components/layout/AppNav.vue` — nav fixe height 80px, transparente sur home, solid sur scroll/autres pages, hamburger mobile
+- [x] `views/HomeView.vue` — assemblage HeroSection + BrandSection + FeaturedSection + CategoriesSection + RitualSection
+- [x] `components/home/HeroSection.vue` — hero fullscreen, cursor custom, animations fadeUp
+- [x] `components/home/FeaturedSection.vue` — grid 4 produits vedettes
+- [x] `components/home/CategoriesSection.vue` — grid 4 catégories avec offsets éditoriaux
+- [x] `components/home/BrandSection.vue` — marquee défilant des marques
+- [x] `components/home/RitualSection.vue` — 4 étapes du rituel K-beauty
+- [x] `views/CatalogueView.vue` — assemblage pur, padding-top 80px, sub-header sticky, layout sidebar + grille
+- [x] `components/catalogue/CatalogueSidebar.vue` — filtres cat/peau/prix/marque, sticky, scroll indépendant
+- [x] `components/catalogue/ProductCard.vue` — carte produit, props typées, emit addToCart
+- [x] `views/LoginView.vue` — layout 2 colonnes, sans AppNav local (géré par App.vue)
+- [x] `components/login/LoginLeft.vue` — visuel décoratif K-beauty
+- [x] `components/login/LoginRight.vue` — formulaire login + bouton Keycloak
+- [x] `views/ProductView.vue` — fiche produit, layout image gauche / infos droite, accordéons, quantité, wishlist
+- [x] `components/product/ProductImageCol.vue` — visuel produit, cercles déco, thumbnails, badge
+- [x] `components/product/ProductInfoCol.vue` — brand, nom, note, prix, skin type, quantité, CTA, accordéons description/ingrédients
+- [x] `views/CartView.vue` — liste articles + résumé sticky, état vide
+- [x] `components/cart/CartItem.vue` — ligne article, quantité +/−, suppression, prix calculé
+- [x] `components/cart/CartSummary.vue` — sous-total, sélection livraison, total, bouton commander
+- [x] `views/OrdersView.vue` — historique commandes, tabs filtre, accordéon, tracking visuel
+- [x] `components/orders/OrderCard.vue` — card commande, accordéon, badges statut, boutons actions
+- [x] `components/orders/OrderTracking.vue` — stepper visuel 4 étapes (confirmée → livrée)
+- [x] `views/ProfileView.vue` — sidebar nav, 3 panels : infos / adresses / sécurité
+- [x] `components/profile/ProfileInfos.vue` — formulaire infos perso, labels + placeholders accessibles
+- [x] `components/profile/ProfileAddresses.vue` — liste adresses, badge défaut, ajout/suppression
+- [x] `components/profile/ProfileSecurity.vue` — mot de passe, Keycloak, suppression compte
+- [ ] Services API Fetch natif (auth, product, order, user)
+- [ ] Store Pinia panier — connecter ProductCard → CartView
+
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-Tests unitaires `product-service` puis passer à `order-service`
+Phase 4 — Connecter les interfaces au backend (stores Pinia + services Fetch natif)
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2
 - Prometheus + Grafana + Jaeger reportés en Phase 2
 - `docker-stack.yml` (Swarm) reporté en Phase 2
-- Frontend (React vs Angular 19) — décision non encore prise
+- Frontend choisi : Vue 3 + Vite + TypeScript + PrimeVue
 - `notification-service` n'a pas de base PostgreSQL — service stateless
 - Pas de pom.xml parent — chaque service généré via Spring Initializr
 - Keycloak comme source de vérité unique pour les rôles et l'auth
@@ -125,6 +161,74 @@ Tests unitaires `product-service` puis passer à `order-service`
 - Ports Docker liés à 127.0.0.1 — sécurité dev local
 - Tests d'intégration Testcontainers reportés après validation end-to-end de chaque service
 - `gen_random_uuid()` utilisé à la place de `uuid-ossp` (PostgreSQL 16 natif)
+- `AppNav` monté uniquement dans `App.vue` — aucune view ne doit l'importer
+- `CatalogueView` sans footer — layout sticky sidebar incompatible avec footer
+- Nav hauteur fixe `80px` dans tous les états — toutes les views ont `padding-top: 80px`
+- Phase statique frontend — données hardcodées, pas d'appels API pendant la phase design
+
+---
+
+## Règles Frontend
+
+### Structure des fichiers
+```
+src/
+├── assets/
+│   └── styles/
+│       ├── variables.css    ← CSS variables K-beauty (couleurs, typo, spacing)
+│       ├── animations.css   ← keyframes réutilisables
+│       └── base.css         ← reset + styles globaux
+├── components/
+│   ├── layout/
+│   │   ├── AppNav.vue       ← navigation globale — monté UNE SEULE FOIS dans App.vue
+│   │   └── AppFooter.vue    ← footer global
+│   └── [feature]/           ← composants par fonctionnalité
+│       └── FeatureSection.vue
+├── views/                   ← assemblage uniquement, zéro CSS métier
+│   └── HomeView.vue
+├── stores/                  ← Pinia stores
+├── services/                ← API calls via Fetch natif
+└── router/
+```
+
+### Règles de composants
+- **Views** — assemblage uniquement, zéro CSS métier, zéro logique métier complexe
+- **Components** — un composant = une responsabilité, CSS scoped
+- **Max 200 lignes par fichier** — au-delà, découper en sous-composants
+- **CSS global** — uniquement dans `assets/styles/`, jamais dans App.vue
+- **CSS scoped** — toujours `<style scoped>` dans les composants
+- **PrimeVue** — composants complexes uniquement (DataTable, Toast, Dialog, Calendar) — jamais pour les inputs/boutons dont le design est custom K-beauty
+- **Navigation** — toujours `RouterLink` ou `router.push()`, jamais de `<a href>`
+- **AppNav** — monté UNE SEULE FOIS dans `App.vue`, jamais importé dans une view
+- **padding-top: 80px** — toutes les views doivent compenser la nav fixe de 80px
+
+### Règles de layout
+- **AppNav** — `position: fixed`, `height: 80px` fixe, fond transparent sur `/` non scrollée, fond `--ivory` ailleurs
+- **Sub-header** (si présent) — `position: sticky; top: 80px`
+- **Sidebar** (si présente) — `position: sticky; top: 125px; max-height: calc(100vh - 125px); overflow-y: auto`
+- **CatalogueView** — pas de footer (layout sticky sidebar incompatible)
+- **Autres views** — footer présent
+
+### Règles de responsive
+- **Mobile first** — écrire d'abord le CSS mobile, puis les breakpoints desktop
+- **Breakpoints** :
+  - Mobile : < 768px
+  - Tablet : 768px - 1024px
+  - Desktop : > 1024px
+- **Toutes les pages doivent avoir une version mobile**
+- **Navigation mobile** — hamburger menu sur mobile
+- **Grid** — passer de multi-colonnes à 1 colonne sur mobile
+
+### HTTP Client
+- **Fetch API natif uniquement** — pas d'Axios (supply chain risk)
+- Les appels API sont dans `src/services/` uniquement
+- Jamais d'appel fetch directement dans un composant ou une view
+
+### Conventions
+- Noms de composants : PascalCase (`AppNav.vue`, `HeroSection.vue`)
+- Noms de fichiers CSS : kebab-case (`variables.css`)
+- Props TypeScript : toujours typées
+- Emits TypeScript : toujours typés
 
 ---
 
@@ -142,8 +246,12 @@ Tests unitaires `product-service` puis passer à `order-service`
 - **Migrations** : Flyway
 
 ### Frontend
-- **Framework** : React (marché France / startups coréennes) OU Angular 19 (IT shops coréennes)
-- **Décision finale** : à confirmer selon le marché ciblé en priorité
+- **Framework** : Vue 3 + Vite + TypeScript
+- **UI Library** : PrimeVue + PrimeIcons — composants complexes uniquement (DataTable, Toast, Dialog, Calendar)
+- **State Management** : Pinia
+- **Router** : Vue Router 5 (SPA mode)
+- **HTTP Client** : Fetch API natif — pas d'Axios (supply chain risk)
+- **Port dev** : 3000
 
 ### Infrastructure
 - **Orchestration** : Docker Swarm (pas Kubernetes — décision volontaire pour maîtriser la complexité)
@@ -172,7 +280,7 @@ Tests unitaires `product-service` puis passer à `order-service`
 | `delivery-service` | 8084 | Tracking livraison simulé | WebSocket, `@Scheduled`, Kafka consumer |
 | `notification-service` | 8085 | Email/push/SMS simulés | Kafka consumer pur, pas de BDD |
 | `payment-service` | 8086 | Paiement simulé | Saga pattern (chorégraphie), Kafka |
-| `frontend` | 3000 | Interface utilisateur | React ou Angular 19 |
+| `frontend` | 3000 | Interface utilisateur | Vue 3, Vite, TypeScript, PrimeVue, Pinia |
 
 Infrastructure transverse : Traefik (80/443), Keycloak (8080), Kafka (9092, mode KRaft — sans Zookeeper), PostgreSQL (5432), Redis (6379), Prometheus (9090), Grafana (3001), Jaeger (16686).
 
@@ -315,6 +423,8 @@ src/main/java/com/smartdelivery/{service}/
 - Ne pas mélanger Node.js dans les services backend — Spring Boot uniquement
 - Ne pas utiliser `@Autowired` sur les champs
 - Ne pas créer de transaction qui span plusieurs services — utiliser Saga
+- Ne pas importer `AppNav` dans une view — il est dans `App.vue`
+- Ne pas oublier `padding-top: 80px` sur les nouvelles views
 
 ---
 
@@ -350,9 +460,6 @@ matrix:
 - **Sur chaque PR vers `develop`** : mettre à jour la section `[Unreleased]` avec les changements
 - **Sur chaque PR vers `main`** : renommer `[Unreleased]` avec le numéro de version et la date
 - Catégories : `Added`, `Fixed`, `Changed`, `Removed`, `Infrastructure`
-- CodeQL est lent (5-15 min) — trop lourd pour chaque PR de feature
-- Les vulnérabilités sont traitées sereinement avant prod
-- `develop` = feedback rapide, `main` = qualité garantie
 
 ```bash
 # Démarrer l'environnement de dev local
