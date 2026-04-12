@@ -132,8 +132,13 @@ Phase 3 — Frontend Vue 3
 - [x] `views/CartView.vue` — liste articles + résumé sticky, état vide
 - [x] `components/cart/CartItem.vue` — ligne article, quantité +/−, suppression, prix calculé
 - [x] `components/cart/CartSummary.vue` — sous-total, sélection livraison, total, bouton commander
-- [ ] `views/OrdersView.vue` — historique commandes
-- [ ] `views/ProfileView.vue` — compte utilisateur
+- [x] `views/OrdersView.vue` — historique commandes, tabs filtre, accordéon, tracking visuel
+- [x] `components/orders/OrderCard.vue` — card commande, accordéon, badges statut, boutons actions
+- [x] `components/orders/OrderTracking.vue` — stepper visuel 4 étapes (confirmée → livrée)
+- [x] `views/ProfileView.vue` — sidebar nav, 3 panels : infos / adresses / sécurité
+- [x] `components/profile/ProfileInfos.vue` — formulaire infos perso, labels + placeholders accessibles
+- [x] `components/profile/ProfileAddresses.vue` — liste adresses, badge défaut, ajout/suppression
+- [x] `components/profile/ProfileSecurity.vue` — mot de passe, Keycloak, suppression compte
 - [ ] Services API Fetch natif (auth, product, order, user)
 - [ ] Store Pinia panier — connecter ProductCard → CartView
 
@@ -141,7 +146,7 @@ Phase 3 — Frontend Vue 3
 - Aucun
 
 ### Prochaine étape
-`OrdersView` puis `ProfileView` — interfaces uniquement, données statiques
+Phase 4 — Connecter les interfaces au backend (stores Pinia + services Fetch natif)
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2
