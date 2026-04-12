@@ -30,7 +30,7 @@ public class Delivery {
     private UUID userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "delivery_status")
+    @Column(name = "status", nullable = false)
     @Builder.Default
     private DeliveryStatus status = DeliveryStatus.ASSIGNED;
 
