@@ -29,7 +29,7 @@ const router = createRouter({
       path: '/commandes',
       name: 'orders',
       component: () => import('@/views/OrdersView.vue'),
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: '/profil',
