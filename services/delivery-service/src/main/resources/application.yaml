@@ -1,3 +1,74 @@
+server:
+  port: 8084
+
 spring:
   application:
     name: delivery-service
+
+  # ── PostgreSQL ──────────────────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartdelivery
+    username: delivery_user
+    password: delivery_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: delivery_service
+
+  # ── Flyway ──────────────────────────────────────────────────
+  flyway:
+    enabled: true
+    schemas: delivery_service
+    default-schema: delivery_service
+
+  # ── Kafka ───────────────────────────────────────────────────
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: delivery-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.smartdelivery.*"
+        spring.json.value.default.type: com.smartdelivery.delivery_service.event.PaymentSucceededEvent
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  # ── OAuth2 / Keycloak JWT ───────────────────────────────────
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/smartdelivery/protocol/openid-connect/certs
+
+# ── Simulation livraison ────────────────────────────────────
+delivery:
+  simulation:
+    delay-seconds: 30
+
+# ── Actuator ────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
+
+# ── Springdoc / Swagger ─────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
