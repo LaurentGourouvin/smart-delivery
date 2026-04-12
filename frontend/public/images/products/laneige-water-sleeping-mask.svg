@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <rect width="200" height="280" fill="#E8EEF5"/>
+  <!-- Couvercle -->
+  <ellipse cx="100" cy="115" rx="60" ry="14" fill="#4A7FA5"/>
+  <rect x="40" y="105" width="120" height="22" rx="0" fill="#4A7FA5"/>
+  <ellipse cx="100" cy="127" rx="60" ry="14" fill="#4A7FA5"/>
+  <!-- Corps pot -->
+  <rect x="42" y="127" width="116" height="80" rx="4" fill="#C8DCF0" stroke="#4A7FA5" stroke-width="1.5"/>
+  <ellipse cx="100" cy="207" rx="58" ry="12" fill="#C8DCF0" stroke="#4A7FA5" stroke-width="1.5"/>
+  <!-- Reflet couvercle -->
+  <ellipse cx="100" cy="115" rx="42" ry="8" fill="white" opacity="0.2"/>
+  <!-- Label sur couvercle -->
+  <text x="100" y="112" font-family="Georgia,serif" font-size="8" font-weight="bold" fill="white" text-anchor="middle">LANEIGE</text>
+  <!-- Label corps -->
+  <rect x="55" y="138" width="90" height="58" rx="2" fill="white" opacity="0.6"/>
+  <text x="100" y="158" font-family="Georgia,serif" font-size="6.5" font-weight="bold" fill="#1A1614" text-anchor="middle">LANEIGE</text>
+  <line x1="62" y1="163" x2="138" y2="163" stroke="#4A7FA5" stroke-width="0.8"/>
+  <text x="100" y="174" font-family="Georgia,serif" font-size="5.5" fill="#1A1614" text-anchor="middle">Water Sleeping M</text>
+  <text x="100" y="184" font-family="Georgia,serif" font-size="5" fill="#1A1614" text-anchor="middle">ask Lavender</text>
+</svg>

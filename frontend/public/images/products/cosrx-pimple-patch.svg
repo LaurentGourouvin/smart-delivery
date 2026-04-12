@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <rect width="200" height="280" fill="#F2EAE8"/>
+  <!-- Pochette principale -->
+  <rect x="35" y="60" width="130" height="170" rx="8" fill="#E8D5D0" stroke="#C4485A" stroke-width="1.5"/>
+  <!-- Bande haut -->
+  <rect x="35" y="60" width="130" height="35" rx="8" fill="#C4485A"/>
+  <rect x="35" y="80" width="130" height="15" fill="#C4485A"/>
+  <!-- Trait perforation -->
+  <line x1="42" y1="96" x2="158" y2="96" stroke="white" stroke-width="1" stroke-dasharray="4,3"/>
+  <!-- Visage masque stylisé -->
+  <ellipse cx="100" cy="165" rx="42" ry="50" fill="white" opacity="0.5"/>
+  <ellipse cx="85" cy="155" rx="8" ry="5" fill="#C4485A" opacity="0.3"/>
+  <ellipse cx="115" cy="155" rx="8" ry="5" fill="#C4485A" opacity="0.3"/>
+  <path d="M88 178 Q100 188 112 178" stroke="#C4485A" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <!-- Texte bande -->
+  <text x="100" y="83" font-family="Georgia,serif" font-size="8" font-weight="bold" fill="white" text-anchor="middle">COSRX</text>
+  <!-- Label corps -->
+  <text x="100" y="125" font-family="Georgia,serif" font-size="6" fill="#1A1614" text-anchor="middle">Acne Pimple Mast</text>
+  <text x="100" y="136" font-family="Georgia,serif" font-size="5.5" fill="#1A1614" text-anchor="middle">er Patch</text>
+  <!-- SHEET MASK -->
+  <text x="100" y="222" font-family="Georgia,serif" font-size="5.5" fill="#C4485A" text-anchor="middle">SHEET MASK</text>
+</svg>
