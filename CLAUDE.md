@@ -17,7 +17,7 @@ Niveau cible : mid+ développeur fullstack orienté Java/Spring Boot.
 ## Status
 
 ### Phase actuelle
-Phase 3 — Frontend Vue 3
+Phase 3 — Backend complet (tous les services implémentés)
 
 ### Fait
 - [x] Structure du repo
@@ -142,22 +142,28 @@ Phase 3 — Frontend Vue 3
 - [ ] Services API Fetch natif (auth, product, order, user)
 - [ ] Store Pinia panier — connecter ProductCard → CartView
 
-### Avancement Seeding BDD
-- [x] `V2__seed_products.sql` — 80 produits K-beauty réels (8 marques × 8 catégories)
-  - Marques : COSRX, Laneige, Innisfree, Sulwhasoo, Some By Mi, Missha, Klairs, Etude
-  - Catégories : Sérum, Crème, Toner, Masque, Essence, Nettoyant, Crème solaire, Contour des yeux
-  - Champs renseignés : name, description, brand, price, stock, image_url, skin_type, volume_ml
-  - INSERT via JOIN sur categories.slug — pas d'UUID hardcodé
-- [x] 80 SVGs custom générés — un par produit, aux couleurs de chaque marque
-  - 6 formes : flacon pompe, tube, pot, flacon toner, tube solaire, pipette œil, sachet masque
-  - Placés dans `frontend/public/images/products/{slug}.svg`
-  - image_url dans SQL : `/images/products/{slug}.svg`
+### Avancement delivery-service
+- [x] `pom.xml` — Spring Boot 3.5.x, Java 21, WebSocket, Kafka, JPA, Security, OAuth2, Validation, Testcontainers, Failsafe
+- [x] `application.yaml` — aligné conventions (currentSchema dans URL, format_sql, prometheus, json.add.type.headers)
+- [x] `docs/MCD.md` — modèle conceptuel, machine à états, choix de conception
+- [x] `V1__init_delivery_service.sql` — table deliveries, VARCHAR + CHECK, pas de CREATE TYPE PostgreSQL
+- [x] `entity/Delivery.java` + `entity/DeliveryStatus.java`
+- [x] `repository/DeliveryRepository.java` — existsByOrderId, findByOrderId, findAllByStatusNot
+- [x] `dto/DeliveryResponse.java` — record pur, conversion dans le service
+- [x] `event/PaymentSucceededEvent.java` + `event/DeliveryUpdatedEvent.java`
+- [x] `config/SecurityConfig.java` + `config/WebSocketConfig.java` + `config/KafkaTopicConfig.java`
+- [x] `service/DeliveryService.java` — @KafkaListener, @Scheduled machine à états, WebSocket push, idempotence, Optimistic Lock
+- [x] `controller/DeliveryController.java` — GET /api/deliveries/order/{orderId}
+- [x] `exception/` — DeliveryNotFoundException, GlobalExceptionHandler
+- [x] `DeliveryServiceApplication.java` — @EnableScheduling
+- [x] Tests unitaires — 6 tests Mockito (@BeforeEach, @DisplayName, @MockitoSettings LENIENT)
+- [ ] Validé end-to-end — payment.succeeded → ASSIGNED → PICKED_UP → IN_TRANSIT → DELIVERED
 
 ### Bloquant
 - Aucun
 
 ### Prochaine étape
-`delivery-service` — dernier service backend (WebSocket + @Scheduled + Kafka consumer)
+Validation end-to-end delivery-service puis Phase 4 — connecter les interfaces au backend (stores Pinia + services Fetch natif)
 
 ### Décisions prises en session (non couvertes par les ADR)
 - ELK Stack reporté en Phase 2
