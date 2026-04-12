@@ -1,0 +1,22 @@
+:root {
+    --ivory: #F7F3EE;
+    --ivory-dark: #EDE8E0;
+    --cherry: #C4485A;
+    --cherry-light: #E8A0AA;
+    --ink: #1A1614;
+    --ink-soft: #4A3F3A;
+    --sage: #8A9E8C;
+    --gold: #C9A96E;
+
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'DM Sans', sans-serif;
+
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 4rem;
+    --spacing-xl: 8rem;
+
+    --breakpoint-mobile: 768px;
+    --breakpoint-tablet: 1024px;
+}

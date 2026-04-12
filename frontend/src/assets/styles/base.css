@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+@import './variables.css';
+@import './animations.css';
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--ivory);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 300;
+    overflow-x: hidden;
+}
+
+.section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--cherry);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.section-label::before {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: var(--cherry);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--ink);
+}
+.section-title em {
+    font-style: italic;
+    color: var(--cherry);
+}
+
+/* Responsive helpers */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: clamp(2rem, 8vw, 3rem);
+    }
+}
