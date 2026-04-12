@@ -23,7 +23,7 @@ const router = createRouter({
       path: '/panier',
       name: 'cart',
       component: () => import('@/views/CartView.vue'),
-      meta: { requiresAuth: true },
+      //meta: { requiresAuth: true },
     },
     {
       path: '/commandes',
