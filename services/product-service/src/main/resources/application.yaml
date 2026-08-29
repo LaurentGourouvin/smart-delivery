@@ -3,10 +3,13 @@ spring:
     name: product-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/smartdelivery?currentSchema=product_service
+    url: jdbc:postgresql://localhost:5432/product_service
     username: product_svc
     password: product_svc_pass
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
 
   jpa:
     hibernate:
@@ -19,7 +22,6 @@ spring:
 
   flyway:
     enabled: true
-    schemas: product_service
     locations: classpath:db/migration
 
   security:
