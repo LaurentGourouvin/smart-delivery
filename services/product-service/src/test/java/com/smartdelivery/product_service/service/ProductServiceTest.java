@@ -78,23 +78,39 @@ class ProductServiceTest {
     }
 
     // ─────────────────────────────────────────
-    // getAllProducts
+    // searchProducts
     // ─────────────────────────────────────────
 
     @Test
-    @DisplayName("getAllProducts — retourne les produits actifs")
-    void getAllProducts_returnsActiveProducts() {
-        when(productRepository.findByActiveTrue()).thenReturn(List.of(existingProduct));
+    @DisplayName("searchProducts — sans filtre, retourne les produits actifs")
+    void searchProducts_noFilter_returnsActiveProducts() {
+        when(productRepository.search(null, null, null, null, null, null))
+                .thenReturn(List.of(existingProduct));
 
-        List<ProductResponse> result = productService.getAllProducts();
-
-
-        System.out.println("Result size: " + result.size());
-        System.out.println("Product active: " + existingProduct.getActive());
-        System.out.println("Product id: " + existingProduct.getId());
+        List<ProductResponse> result =
+                productService.searchProducts(null, null, null, null, null, null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).name()).isEqualTo("COSRX Snail Essence");
+    }
+
+    @Test
+    @DisplayName("searchProducts — transmet tous les critères combinés au repository")
+    void searchProducts_combinedFilters_passesAllCriteria() {
+        BigDecimal min = BigDecimal.valueOf(10);
+        BigDecimal max = BigDecimal.valueOf(50);
+
+        when(productRepository.search(categoryId, "COSRX", SkinType.ALL, min, max, true))
+                .thenReturn(List.of(existingProduct));
+
+        List<ProductResponse> result = productService.searchProducts(
+                categoryId, "COSRX", SkinType.ALL, min, max, true);
+
+        assertThat(result).hasSize(1);
+
+        // Aucun critère n'est perdu en route — l'ancienne chaîne de if
+        // n'en appliquait qu'un seul et ignorait les autres en silence
+        verify(productRepository).search(categoryId, "COSRX", SkinType.ALL, min, max, true);
     }
 
     // ─────────────────────────────────────────
