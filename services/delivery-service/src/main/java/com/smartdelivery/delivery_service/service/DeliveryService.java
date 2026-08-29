@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,22 +71,16 @@ public class DeliveryService {
         log.info("Advancing {} active deliveries", active.size());
 
         for (Delivery delivery : active) {
-            try {
-                DeliveryStatus next = nextStatus(delivery.getStatus());
-                delivery.setStatus(next);
+            DeliveryStatus next = nextStatus(delivery.getStatus());
+            delivery.setStatus(next);
 
-                if (next == DeliveryStatus.DELIVERED) {
-                    delivery.setDeliveredAt(LocalDateTime.now());
-                }
-
-                deliveryRepository.save(delivery);
-                publishAndPush(delivery);
-
-                log.info("Delivery id={} advanced to {}", delivery.getId(), next);
-
-            } catch (ObjectOptimisticLockingFailureException e) {
-                log.warn("Optimistic lock conflict for deliveryId={} — skipping", delivery.getId());
+            if (next == DeliveryStatus.DELIVERED) {
+                delivery.setDeliveredAt(LocalDateTime.now());
             }
+
+            publishAndPush(delivery);
+
+            log.info("Delivery id={} advanced to {}", delivery.getId(), next);
         }
     }
 
