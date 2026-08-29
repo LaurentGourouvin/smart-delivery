@@ -99,12 +99,14 @@ class DeliveryServiceTest {
         Delivery delivery = buildDelivery(DeliveryStatus.ASSIGNED);
         when(deliveryRepository.findAllByStatusNot(DeliveryStatus.DELIVERED))
                 .thenReturn(List.of(delivery));
-        when(deliveryRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         deliveryService.advanceDeliveries();
 
         assertThat(delivery.getStatus()).isEqualTo(DeliveryStatus.PICKED_UP);
         verify(kafkaTemplate).send(eq("delivery.updated"), anyString(), any());
+
+        // L'entité est managée : l'UPDATE vient du dirty checking, pas de save()
+        verify(deliveryRepository, never()).save(any());
     }
 
     @Test
@@ -113,12 +115,12 @@ class DeliveryServiceTest {
         Delivery delivery = buildDelivery(DeliveryStatus.IN_TRANSIT);
         when(deliveryRepository.findAllByStatusNot(DeliveryStatus.DELIVERED))
                 .thenReturn(List.of(delivery));
-        when(deliveryRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         deliveryService.advanceDeliveries();
 
         assertThat(delivery.getStatus()).isEqualTo(DeliveryStatus.DELIVERED);
         assertThat(delivery.getDeliveredAt()).isNotNull();
+        verify(deliveryRepository, never()).save(any());
     }
 
     @Test

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,26 +32,18 @@ public class ProductController {
     }
 
     // Products - read
+    // Tous les filtres sont optionnels et se combinent
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts(
+    public ResponseEntity<List<ProductResponse>> searchProducts(
             @RequestParam(required = false) UUID categoryId,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) SkinType skinType,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean inStock
     ) {
-        if (categoryId != null) {
-            return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
-        }
-        if (brand != null) {
-            return ResponseEntity.ok(productService.getProductsByBrand(brand));
-        }
-        if (skinType != null) {
-            return ResponseEntity.ok(productService.getProductsBySkinType(skinType));
-        }
-        if (Boolean.TRUE.equals(inStock)) {
-            return ResponseEntity.ok(productService.getProductsInStock());
-        }
-        return ResponseEntity.ok(productService.getAllProducts());
+        return ResponseEntity.ok(productService.searchProducts(
+                categoryId, brand, skinType, minPrice, maxPrice, inStock));
     }
 
     @GetMapping("/{id}")

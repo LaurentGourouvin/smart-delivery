@@ -9,6 +9,8 @@ import com.smartdelivery.order_service.dto.OrderResponse;
 import com.smartdelivery.order_service.dto.UpdateOrderStatusRequest;
 import com.smartdelivery.order_service.entity.Order;
 import com.smartdelivery.order_service.entity.OrderStatus;
+import com.smartdelivery.order_service.event.PaymentFailedEvent;
+import com.smartdelivery.order_service.event.PaymentSucceededEvent;
 import com.smartdelivery.order_service.exception.OrderNotFoundException;
 import com.smartdelivery.order_service.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -202,5 +204,82 @@ class OrderServiceTest {
 
         assertThatThrownBy(() -> orderService.updateOrderStatus(orderId, request))
                 .isInstanceOf(OrderNotFoundException.class);
+    }
+
+    // ─────────────────────────────────────────
+    // Saga — réactions aux événements de paiement
+    // ─────────────────────────────────────────
+
+    @Test
+    @DisplayName("onPaymentSucceeded — passe la commande PENDING en CONFIRMED")
+    void onPaymentSucceeded_confirmsPendingOrder() {
+        PaymentSucceededEvent event = PaymentSucceededEvent.builder()
+                .paymentId(UUID.randomUUID())
+                .orderId(orderId)
+                .userId(userId)
+                .paymentIntentId("pi_123")
+                .amount(BigDecimal.valueOf(49.98))
+                .build();
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
+        when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        orderService.onPaymentSucceeded(event);
+
+        assertThat(existingOrder.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+        verify(kafkaTemplate).send(eq("order.status-changed"), anyString(), any());
+    }
+
+    @Test
+    @DisplayName("onPaymentFailed — passe la commande PENDING en CANCELLED")
+    void onPaymentFailed_cancelsPendingOrder() {
+        PaymentFailedEvent event = PaymentFailedEvent.builder()
+                .orderId(orderId)
+                .userId(userId)
+                .failureReason("Payment declined by issuing bank")
+                .items(List.of())
+                .build();
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
+        when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        orderService.onPaymentFailed(event);
+
+        assertThat(existingOrder.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+        verify(kafkaTemplate).send(eq("order.status-changed"), anyString(), any());
+    }
+
+    @Test
+    @DisplayName("onPaymentSucceeded — idempotent, ignore une commande déjà confirmée")
+    void onPaymentSucceeded_isIdempotent_whenAlreadyConfirmed() {
+        existingOrder.setStatus(OrderStatus.CONFIRMED);
+
+        PaymentSucceededEvent event = PaymentSucceededEvent.builder()
+                .orderId(orderId)
+                .userId(userId)
+                .build();
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
+
+        orderService.onPaymentSucceeded(event);
+
+        verify(orderRepository, never()).save(any(Order.class));
+        verify(kafkaTemplate, never()).send(anyString(), anyString(), any());
+    }
+
+    @Test
+    @DisplayName("onPaymentFailed — commande introuvable, aucun effet")
+    void onPaymentFailed_unknownOrder_doesNothing() {
+        PaymentFailedEvent event = PaymentFailedEvent.builder()
+                .orderId(orderId)
+                .items(List.of())
+                .build();
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        orderService.onPaymentFailed(event);
+
+        verify(orderRepository, never()).save(any(Order.class));
+        verify(kafkaTemplate, never()).send(anyString(), anyString(), any());
     }
 }
