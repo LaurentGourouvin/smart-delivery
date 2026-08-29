@@ -9,10 +9,13 @@ import com.smartdelivery.order_service.entity.OrderStatus;
 import com.smartdelivery.order_service.event.OrderCreatedEvent;
 import com.smartdelivery.order_service.event.OrderItemEvent;
 import com.smartdelivery.order_service.event.OrderStatusChangedEvent;
+import com.smartdelivery.order_service.event.PaymentFailedEvent;
+import com.smartdelivery.order_service.event.PaymentSucceededEvent;
 import com.smartdelivery.order_service.exception.OrderNotFoundException;
 import com.smartdelivery.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -159,6 +162,70 @@ public class OrderService {
         return toOrderResponse(saved);
     }
 
+    // ── Saga
+
+    /**
+     * Paiement accepté → la commande passe en CONFIRMED.
+     */
+    @KafkaListener(
+            topics = "payment.succeeded",
+            groupId = "order-service",
+            containerFactory = "paymentSucceededListenerFactory"
+    )
+    @Transactional
+    public void onPaymentSucceeded(PaymentSucceededEvent event) {
+        log.info("Received payment.succeeded for order {}", event.getOrderId());
+        applyStatusIfPending(event.getOrderId(), OrderStatus.CONFIRMED);
+    }
+
+    /**
+     * Paiement refusé → la commande passe en CANCELLED.
+     *
+     * La restitution du stock n'est pas gérée ici : product-service écoute le
+     * même payment.failed et compense de son côté. Les deux services réagissent
+     * au même fait sans se connaître.
+     */
+    @KafkaListener(
+            topics = "payment.failed",
+            groupId = "order-service",
+            containerFactory = "paymentFailedListenerFactory"
+    )
+    @Transactional
+    public void onPaymentFailed(PaymentFailedEvent event) {
+        log.info("Received payment.failed for order {} — reason: {}",
+                event.getOrderId(), event.getFailureReason());
+        applyStatusIfPending(event.getOrderId(), OrderStatus.CANCELLED);
+    }
+
+    // Change le statut d'une commande encore PENDING et publie order.status-changed
+    private void applyStatusIfPending(UUID orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+
+        if (order == null) {
+            log.warn("Order {} not found — event ignored", orderId);
+            return;
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            log.warn("Order {} already in status {} — skipping", orderId, order.getStatus());
+            return;
+        }
+
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(newStatus);
+        Order saved = orderRepository.save(order);
+
+        OrderStatusChangedEvent event = OrderStatusChangedEvent.builder()
+                .orderId(saved.getId())
+                .userId(saved.getUserId())
+                .oldStatus(oldStatus)
+                .newStatus(newStatus)
+                .build();
+
+        kafkaTemplate.send(TOPIC_ORDER_STATUS_CHANGED, saved.getId().toString(), event);
+        log.info("Order {} : {} → {}", saved.getId(), oldStatus, newStatus);
+    }
+
     private OrderResponse toOrderResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> new OrderItemResponse(
@@ -185,4 +252,6 @@ public class OrderService {
                 items
         );
     }
+
+
 }

@@ -7,8 +7,12 @@ import com.smartdelivery.product_service.entity.Product;
 import com.smartdelivery.product_service.entity.SkinType;
 import com.smartdelivery.product_service.exception.CategoryNotFoundException;
 import com.smartdelivery.product_service.exception.ProductNotFoundException;
+import com.smartdelivery.product_service.event.OrderItemEvent;
+import com.smartdelivery.product_service.event.PaymentFailedEvent;
 import com.smartdelivery.product_service.repository.CategoryRepository;
 import com.smartdelivery.product_service.repository.ProductRepository;
+import com.smartdelivery.product_service.repository.StockRestorationRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +43,12 @@ class ProductServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private StockRestorationRepository stockRestorationRepository;
+
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @InjectMocks
     private ProductService productService;
@@ -226,5 +236,59 @@ class ProductServiceTest {
         productService.restoreStock(productId, 10);
 
         assertThat(existingProduct.getStock()).isEqualTo(60);
+    }
+
+    // ─────────────────────────────────────────
+    // onPaymentFailed — compensation Saga
+    // ─────────────────────────────────────────
+
+    @Test
+    @DisplayName("onPaymentFailed — restitue le stock de chaque item et publie stock.restored")
+    void onPaymentFailed_restoresStockAndPublishesEvent() {
+        UUID orderId = UUID.randomUUID();
+        PaymentFailedEvent event = PaymentFailedEvent.builder()
+                .orderId(orderId)
+                .userId(UUID.randomUUID())
+                .failureReason("Payment declined")
+                .items(List.of(OrderItemEvent.builder()
+                        .productId(productId)
+                        .productName("COSRX Snail Essence")
+                        .quantity(3)
+                        .unitPrice(BigDecimal.valueOf(24.99))
+                        .subtotal(BigDecimal.valueOf(74.97))
+                        .build()))
+                .build();
+
+        when(stockRestorationRepository.existsById(orderId)).thenReturn(false);
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.save(any(Product.class))).thenReturn(existingProduct);
+
+        productService.onPaymentFailed(event);
+
+        assertThat(existingProduct.getStock()).isEqualTo(53);
+        verify(stockRestorationRepository).save(any());
+        verify(kafkaTemplate).send(eq("stock.restored"), eq(orderId.toString()), any());
+    }
+
+    @Test
+    @DisplayName("onPaymentFailed — idempotent, ne restitue pas deux fois le même ordre")
+    void onPaymentFailed_isIdempotent_whenAlreadyRestored() {
+        UUID orderId = UUID.randomUUID();
+        PaymentFailedEvent event = PaymentFailedEvent.builder()
+                .orderId(orderId)
+                .items(List.of(OrderItemEvent.builder()
+                        .productId(productId)
+                        .quantity(3)
+                        .build()))
+                .build();
+
+        // L'événement a déjà été traité lors d'une livraison précédente
+        when(stockRestorationRepository.existsById(orderId)).thenReturn(true);
+
+        productService.onPaymentFailed(event);
+
+        assertThat(existingProduct.getStock()).isEqualTo(50);
+        verify(productRepository, never()).save(any(Product.class));
+        verify(kafkaTemplate, never()).send(anyString(), anyString(), any());
     }
 }

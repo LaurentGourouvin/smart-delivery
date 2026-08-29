@@ -4,12 +4,20 @@ import com.smartdelivery.product_service.dto.*;
 import com.smartdelivery.product_service.entity.Category;
 import com.smartdelivery.product_service.entity.Product;
 import com.smartdelivery.product_service.entity.SkinType;
+import com.smartdelivery.product_service.entity.StockRestoration;
+import com.smartdelivery.product_service.event.OrderItemEvent;
+import com.smartdelivery.product_service.event.PaymentFailedEvent;
+import com.smartdelivery.product_service.event.StockRestoredEvent;
 import com.smartdelivery.product_service.exception.CategoryNotFoundException;
 import com.smartdelivery.product_service.exception.ProductNotFoundException;
 import com.smartdelivery.product_service.repository.CategoryRepository;
 import com.smartdelivery.product_service.repository.ProductRepository;
+import com.smartdelivery.product_service.repository.StockRestorationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +25,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final StockRestorationRepository stockRestorationRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    private static final String TOPIC_STOCK_RESTORED = "stock.restored";
 
     // Categories
     @Transactional(readOnly = true)
@@ -157,6 +170,54 @@ public class ProductService {
         } catch (OptimisticLockingFailureException e) {
             throw new RuntimeException("Stock conflict — please retry", e);
         }
+    }
+
+    // ── Saga : compensation du décrément de stock ──────────────────────
+
+    /**
+     * Paiement refusé → le stock réservé par la commande est restitué.
+     *
+     * product-service réagit au même fait que order-service, sans le connaître :
+     * l'un annule la commande, l'autre rend le stock.
+     *
+     * Idempotence garantie par la table stock_restorations, dont la clé primaire
+     * est l'orderId. Kafka livrant at-least-once, un événement relivré ferait
+     * sinon remonter le stock une seconde fois.
+     */
+    @KafkaListener(topics = "payment.failed", groupId = "product-service")
+    @Transactional
+    public void onPaymentFailed(PaymentFailedEvent event) {
+        log.info("Received payment.failed for order {}", event.getOrderId());
+
+        if (stockRestorationRepository.existsById(event.getOrderId())) {
+            log.warn("Stock already restored for order {} — skipping", event.getOrderId());
+            return;
+        }
+
+        if (event.getItems() == null || event.getItems().isEmpty()) {
+            log.warn("No items in payment.failed for order {} — nothing to restore",
+                    event.getOrderId());
+            return;
+        }
+
+        for (OrderItemEvent item : event.getItems()) {
+            restoreStock(item.getProductId(), item.getQuantity());
+            log.info("Restored {} unit(s) of product {}", item.getQuantity(), item.getProductId());
+        }
+
+        // Marqueur écrit dans la même transaction que les restitutions :
+        // soit tout est appliqué, soit rien ne l'est.
+        stockRestorationRepository.save(
+                StockRestoration.builder().orderId(event.getOrderId()).build());
+
+        StockRestoredEvent restored = StockRestoredEvent.builder()
+                .orderId(event.getOrderId())
+                .items(event.getItems())
+                .build();
+
+        kafkaTemplate.send(TOPIC_STOCK_RESTORED, event.getOrderId().toString(), restored);
+        log.info("Stock restored for order {} — {} item(s), published stock.restored",
+                event.getOrderId(), event.getItems().size());
     }
 
     private CategoryResponse toCategoryResponse(Category category) {
