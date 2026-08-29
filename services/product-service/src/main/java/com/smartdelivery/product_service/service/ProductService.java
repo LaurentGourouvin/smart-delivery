@@ -13,6 +13,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,9 +41,20 @@ public class ProductService {
     }
 
     // Products - read
+
+    /**
+     * Recherche multicritère : tous les filtres sont optionnels et combinables.
+     * Un appel sans aucun filtre retourne l'ensemble des produits actifs.
+     */
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findByActiveTrue()
+    public List<ProductResponse> searchProducts(UUID categoryId,
+                                                String brand,
+                                                SkinType skinType,
+                                                BigDecimal minPrice,
+                                                BigDecimal maxPrice,
+                                                Boolean inStock) {
+        return productRepository
+                .search(categoryId, brand, skinType, minPrice, maxPrice, inStock)
                 .stream()
                 .map(this::toProductResponse)
                 .toList();
@@ -53,38 +65,6 @@ public class ProductService {
         return productRepository.findByIdAndActiveTrue(id)
                 .map(this::toProductResponse)
                 .orElseThrow(() -> new ProductNotFoundException(id));
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByCategory(UUID categoryId) {
-        return productRepository.findByCategoryIdAndActiveTrue(categoryId)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByBrand(String brand) {
-        return productRepository.findByBrandAndActiveTrue(brand)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsBySkinType(SkinType skinType) {
-        return productRepository.findBySkinTypeAndActiveTrue(skinType)
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsInStock() {
-        return productRepository.findAllInStock()
-                .stream()
-                .map(this::toProductResponse)
-                .toList();
     }
 
     // Products - write
