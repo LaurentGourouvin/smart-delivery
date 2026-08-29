@@ -3,10 +3,13 @@ spring:
     name: order-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/smartdelivery?currentSchema=order_service
+    url: jdbc:postgresql://localhost:5432/order_service
     username: order_svc
     password: order_svc_pass
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
 
   jpa:
     hibernate:
@@ -19,7 +22,6 @@ spring:
 
   flyway:
     enabled: true
-    schemas: order_service
     locations: classpath:db/migration
 
   security:
